@@ -8,6 +8,14 @@ export async function proxy(req: NextRequest) {
 
   if (PUBLIC.has(pathname)) return NextResponse.next();
 
+  // Temporary emergency access: dashboard pages are publicly viewable, while
+  // every mutating API remains protected below. Remove this block when the
+  // Vercel account is recovered and normal sign-in can be restored.
+  if (!pathname.startsWith("/api/")) return NextResponse.next();
+
+  // The blank import template is safe to download without a session.
+  if (pathname === "/api/template") return NextResponse.next();
+
   // The scraper posts here with a shared secret instead of a session cookie.
   if (pathname === "/api/ingest") {
     const token = req.headers.get("x-ingest-token");
