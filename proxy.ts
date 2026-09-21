@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isValidSession, SESSION_COOKIE } from "./lib/auth";
 
-const PUBLIC = ["/login", "/api/login"];
+const PUBLIC = new Set(["/login", "/api/login"]);
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (PUBLIC.some((p) => pathname.startsWith(p))) return NextResponse.next();
+  if (PUBLIC.has(pathname)) return NextResponse.next();
 
   // The scraper posts here with a shared secret instead of a session cookie.
   if (pathname === "/api/ingest") {

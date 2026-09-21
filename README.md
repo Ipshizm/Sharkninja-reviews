@@ -31,7 +31,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 |---|---|---|
 | `APP_PASSWORD` | yes | The shared team password on the sign-in page |
 | `AUTH_SECRET` | yes | Signs the session cookie. Any long random string |
-| `DATABASE_URL` | in production | Postgres (Neon). Without it, data goes to `.data/store.json` (fine locally, wiped on every deploy) |
+| `DATABASE_URL` | in production | PostgreSQL connection string. Without it, local development uses `.data/reviews.sqlite`; Vercel serves the bundled snapshot read-only |
 | `INGEST_TOKEN` | no | Shared secret a future scraper sends as `x-ingest-token` to `POST /api/ingest` |
 | `OPENROUTER_API_KEY` | for AI generation | Key used by `npm run insights:generate` to synthesize executive insights |
 | `OPENROUTER_MODEL` | no | OpenRouter model override (defaults to `anthropic/claude-3.5-sonnet`) |
@@ -48,7 +48,7 @@ anything about the data worth a look.
 
 Re-importing a file you have already loaded is safe. Every review gets a hash
 of SKU + reviewer + date + title + opening text, so overlapping monthly exports
-add only what is new. Importing September twice adds 339 then 0.
+add only what is new. Importing the bundled snapshot twice adds 351 then 0.
 
 ## The model template
 
@@ -134,7 +134,7 @@ scraper export will have. No change needed when that day comes.
 
 ## What the numbers will and won't do
 
-339 reviews across 12 SKUs is not a lot, and six SKUs have fewer than ten
+351 reviews across 12 SKUs is not a lot, and six SKUs have fewer than ten
 verified reviews. Rather than draw charts that look confident, the dashboard
 refuses and says why:
 
@@ -198,11 +198,10 @@ Options:
 
 Live on Vercel, deployed from `master`. Every push redeploys.
 
-`APP_PASSWORD` and `AUTH_SECRET` are set in **`vercel.json`** so the deployment
-works without any dashboard setup. That is fine for a private repo and a demo
-link, and it is the first thing to change for anything longer-lived: add the
-two as project environment variables in the Vercel dashboard (those take
-precedence over `vercel.json`) and drop the `env` block from the file.
+Set `APP_PASSWORD`, `AUTH_SECRET`, and `DATABASE_URL` as encrypted project
+environment variables in Vercel for Production. Add them to Preview only when
+preview deployments should use the same protected data. Never commit secrets
+to `vercel.json` or any other repository file.
 
 ### Snapshot mode vs live mode
 
@@ -212,9 +211,10 @@ back to **`data/seed.json`** — the September export, baked in at build time by
 `scripts/build-seed.ts`. Everything on the dashboard is real; only importing is
 switched off, and both the home page and the import page say so.
 
-To turn the deployment into the real thing, set `DATABASE_URL` to a Neon
-Postgres connection string. Tables are created on first use, there is no
-migration step, and the import page becomes a working upload form. Regenerate
+To turn the deployment into the real thing, set `DATABASE_URL` to a PostgreSQL
+connection string. Tables are created on first use and a completely new
+database is seeded idempotently from `data/seed.json`; the import page then
+becomes a working upload form. Regenerate
 the snapshot after a new export with:
 
 ```bash
@@ -227,13 +227,13 @@ npx tsx scripts/build-seed.ts ~/Downloads/SharkNinjaBrief/*.xlsx
 npm test
 ```
 
-60 tests. The parser fixtures are verbatim rows from the September 2026 export
+69 tests. The parser fixtures are verbatim rows from the September 2026 export
 rather than invented examples, and one suite parses the real workbooks and
 asserts the per-SKU counts, so a regression in the record grammar fails loudly.
 That suite skips itself if the files aren't on the machine.
 
 The template tests write the whole September export back out as a CSV and read
-it in again, asserting all 336 review hashes come back unchanged. That is the
+it in again, asserting all 351 review hashes come back unchanged. That is the
 test that catches an encoding or date regression, because both corrupt data
 while the import still reports success.
 
@@ -257,7 +257,7 @@ intended shape:
 
 1. Each SKU's ASIN and Amazon URL is already in `lib/skus.ts`
 2. A scheduled Apify run of `junglee/amazon-reviews-scraper`
-   (~$0.006/review, so a full 339-review refresh is roughly $2, and incremental
+   (~$0.006/review, so a full 351-review refresh is roughly $2, and incremental
    runs cost cents) with `reviewsCutoffDate` set to the last import
 3. Its success webhook POSTs the result to `/api/ingest`
 4. Same parse → dedupe → classify path; import history already records the runs

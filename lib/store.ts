@@ -81,6 +81,32 @@ function postgresStore(url: string): Store {
     async init() {
       const s = await db();
       await s.unsafe(SCHEMA);
+
+      // A newly provisioned production database should start from the same
+      // reviewed snapshot the read-only deployment serves. The insert is
+      // idempotent, so concurrent cold starts and later initialisations are
+      // safe.
+      const initialReviews = (seed.reviews as unknown as Review[]) ?? [];
+      if (initialReviews.length > 0) {
+        const payload = initialReviews.map((r) => ({
+          hash: r.hash,
+          sku_id: r.skuId,
+          reviewer: r.reviewer,
+          rating: r.rating,
+          title: r.title,
+          body: r.body,
+          review_date: r.reviewDate,
+          verified: r.verified,
+          country: r.country,
+          variant: r.variant,
+          buckets: r.buckets,
+          import_id: "bundled-seed",
+        }));
+        await s`
+          insert into reviews ${s(payload)}
+          on conflict (hash) do nothing
+        `;
+      }
     },
     async insertReviews(rows, importId) {
       if (rows.length === 0) return { inserted: 0, duplicates: 0 };
@@ -567,8 +593,9 @@ export function getStore(): Store {
   } else if (process.env.STORE_MODE === "file") {
     cached = fileStore(join(process.cwd(), ".data", "store.json"));
   } else if (process.env.VERCEL) {
-    // Ephemeral SQLite in /tmp for Vercel demo/preview deployments so import is unblocked!
-    cached = sqliteStore("/tmp/reviews.sqlite");
+    // Never pretend an instance-local /tmp database is persistent. Without a
+    // production database, deployments remain useful but explicitly read-only.
+    cached = snapshotStore();
   } else {
     // Default: SQLite in .data/reviews.sqlite
     cached = sqliteStore(join(process.cwd(), ".data", "reviews.sqlite"));
@@ -584,7 +611,7 @@ export function getStoreDescription(): string {
   const store = getStore();
   switch (store.kind) {
     case "postgres":
-      return "PostgreSQL (Neon)";
+      return "PostgreSQL";
     case "sqlite":
       return "SQLite Database";
     case "file":

@@ -185,6 +185,37 @@ describe("sqliteStore Store interface implementation", () => {
   });
 });
 
+describe("production store selection", () => {
+  it("uses the read-only snapshot on Vercel when DATABASE_URL is absent", async () => {
+    const { getStore, resetStoreCacheForTesting } = await import("../lib/store");
+    const previous = {
+      databaseUrl: process.env.DATABASE_URL,
+      sqlitePath: process.env.SQLITE_PATH,
+      storeMode: process.env.STORE_MODE,
+      vercel: process.env.VERCEL,
+    };
+
+    try {
+      delete process.env.DATABASE_URL;
+      delete process.env.SQLITE_PATH;
+      delete process.env.STORE_MODE;
+      process.env.VERCEL = "1";
+      resetStoreCacheForTesting();
+      assert.equal(getStore().kind, "snapshot");
+    } finally {
+      if (previous.databaseUrl === undefined) delete process.env.DATABASE_URL;
+      else process.env.DATABASE_URL = previous.databaseUrl;
+      if (previous.sqlitePath === undefined) delete process.env.SQLITE_PATH;
+      else process.env.SQLITE_PATH = previous.sqlitePath;
+      if (previous.storeMode === undefined) delete process.env.STORE_MODE;
+      else process.env.STORE_MODE = previous.storeMode;
+      if (previous.vercel === undefined) delete process.env.VERCEL;
+      else process.env.VERCEL = previous.vercel;
+      resetStoreCacheForTesting();
+    }
+  });
+});
+
 describe("direct text paste ingest", () => {
   it("ingests raw pasted text for a SKU", async () => {
     const { ingestText } = await import("../lib/ingest");
@@ -222,4 +253,3 @@ describe("direct text paste ingest", () => {
     );
   });
 });
-
