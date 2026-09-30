@@ -6,6 +6,7 @@ import { getAllInsights, getSkuInsight } from "@/lib/insights";
 import { skuById } from "@/lib/skus";
 import { ExecutiveBriefing } from "@/components/ExecutiveBriefing";
 import { ExportLinks } from "@/components/ExportLinks";
+import { ReportLink } from "@/components/ReportLink";
 import { MasterSkuTable } from "@/components/MasterSkuTable";
 import {
   Panel,
@@ -68,7 +69,8 @@ export default async function Home() {
             ) : null}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <ReportLink scopeName="all listings" />
           <ExportLinks filter={{}} count={reviews.length} label="Export all reviews" />
           <Link
             href="/upload"

@@ -13,6 +13,7 @@ import type { Brand } from "@/lib/types";
 import { getAllInsights, getSkuInsight } from "@/lib/insights";
 import { ExecutiveBriefing } from "@/components/ExecutiveBriefing";
 import { ExportLinks } from "@/components/ExportLinks";
+import { ReportLink } from "@/components/ReportLink";
 import {
   NotEnough,
   Panel,
@@ -76,11 +77,14 @@ export default async function BrandPage({
             {stats.all.n} reviews across {stats.skus.length} SKUs
           </p>
         </div>
-        <ExportLinks
-          filter={{ brand }}
-          count={stats.all.n}
-          label={`Export ${brand} reviews`}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <ReportLink brand={brand} scopeName={brand} />
+          <ExportLinks
+            filter={{ brand }}
+            count={stats.all.n}
+            label={`Export ${brand} reviews`}
+          />
+        </div>
       </div>
 
       <RatingComparison verified={stats.verified} all={stats.all} />

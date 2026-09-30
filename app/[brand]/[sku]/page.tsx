@@ -13,6 +13,7 @@ import { loadReviews } from "@/lib/data";
 import { amazonUrl, BRANDS, skuById } from "@/lib/skus";
 import { getSkuInsight } from "@/lib/insights";
 import { BucketBars, InsightCard, ThemeList } from "@/components/Insights";
+import { ReportLink } from "@/components/ReportLink";
 import { ReviewExplorer } from "@/components/ReviewExplorer";
 import {
   InsufficientBadge,
@@ -48,31 +49,34 @@ export default async function SkuPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link
-          href={`/${brand.toLowerCase()}`}
-          className="text-[13px] text-ink-60 hover:text-ink"
-        >
-          ← {brand}
-        </Link>
-        <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight">{sku.name}</h1>
-          {stats.insufficient ? (
-            <InsufficientBadge n={stats.verified.n} />
-          ) : null}
-        </div>
-        <p className="mt-1 text-[13px] text-ink-60">
-          {reviews.length} review{reviews.length === 1 ? "" : "s"}
-          {sku.model ? ` · ${sku.model}` : ""} ·{" "}
-          <a
-            href={amazonUrl(sku)}
-            target="_blank"
-            rel="noreferrer"
-            className="underline hover:text-ink"
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <Link
+            href={`/${brand.toLowerCase()}`}
+            className="text-[13px] text-ink-60 hover:text-ink"
           >
-            listing on Amazon.in
-          </a>
-        </p>
+            ← {brand}
+          </Link>
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">{sku.name}</h1>
+            {stats.insufficient ? (
+              <InsufficientBadge n={stats.verified.n} />
+            ) : null}
+          </div>
+          <p className="mt-1 text-[13px] text-ink-60">
+            {reviews.length} review{reviews.length === 1 ? "" : "s"}
+            {sku.model ? ` · ${sku.model}` : ""} ·{" "}
+            <a
+              href={amazonUrl(sku)}
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-ink"
+            >
+              listing on Amazon.in
+            </a>
+          </p>
+        </div>
+        <ReportLink skuId={sku.id} scopeName={sku.name} />
       </div>
 
       {stats.insufficient ? (
