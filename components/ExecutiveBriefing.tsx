@@ -77,11 +77,14 @@ export function ExecutiveBriefing({
     return { warning, watch, healthy, total: insights.length };
   }, [insights]);
 
-  // Highlight the top priority alerts requiring leadership intervention
+  // Critical before warning, so the top three shown are the three worst
+  // rather than the first three in list order (which put every Ninja SKU
+  // ahead of a critical Shark one).
   const priorityAlerts = useMemo(() => {
-    return insights.filter(
-      (i) => i.tone === "critical" || i.tone === "warning" || i.skuId === "ninja-double-stack",
-    );
+    const rank = (i: EnrichedInsight) => (i.tone === "critical" ? 0 : 1);
+    return insights
+      .filter((i) => i.tone === "critical" || i.tone === "warning")
+      .sort((a, b) => rank(a) - rank(b));
   }, [insights]);
 
   const filtered = useMemo(() => {
@@ -129,7 +132,7 @@ export function ExecutiveBriefing({
             Executive Portfolio Briefing
           </h2>
           <p className="mt-1 text-[13px] text-ink-60">
-            Cross-portfolio commercial diagnosis across all 12 SharkNinja India listings on Amazon.in.
+            Commercial diagnosis across {insights.length} SharkNinja India listing{insights.length === 1 ? "" : "s"} on Amazon.in.
           </p>
         </div>
 
@@ -153,11 +156,13 @@ export function ExecutiveBriefing({
       {/* Priority Action Callout Box */}
       {priorityAlerts.length > 0 && activeTab === "all" && !searchQuery ? (
         <div className="mt-6 rounded-xl border border-warn-line bg-warn-bg/50 p-5">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <h3 className="text-[12px] font-bold uppercase tracking-wider text-warn">
               Priority Commercial Interventions ({priorityAlerts.length} Alerts)
             </h3>
-            <span className="text-[11px] text-ink-40">Require Category / CX Action</span>
+            <span className="text-[11px] text-ink-40">
+              {priorityAlerts.length > 3 ? "Worst 3 shown · " : ""}Require Category / CX Action
+            </span>
           </div>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {priorityAlerts.slice(0, 3).map((item) => (
@@ -168,8 +173,10 @@ export function ExecutiveBriefing({
                 <div>
                   <div className="flex items-center justify-between gap-1">
                     <span className="text-[11px] font-semibold text-ink-40 uppercase">{item.brand}</span>
-                    <span className="rounded px-1.5 py-0.5 text-[10px] font-bold text-warn bg-warn-bg">
-                      {item.tone === "warning" ? "Action Needed" : "Review Defense"}
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${TONE_BADGE[item.tone].text} ${TONE_BADGE[item.tone].bg}`}
+                    >
+                      {TONE_BADGE[item.tone].label}
                     </span>
                   </div>
                   <Link

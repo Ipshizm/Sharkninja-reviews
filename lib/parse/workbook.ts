@@ -25,9 +25,10 @@ export type WorkbookResult = {
  * Sheets that carry the product list or the instructions rather than reviews.
  * Only consulted after the template check, because a CSV is handed to us as a
  * single sheet named "Sheet1" and skipping it on the name alone silently threw
- * every row away.
+ * every row away. "Summary" and "About this file" are the dashboard's own
+ * export, which is meant to import straight back in.
  */
-const INDEX_SHEETS = /^(sheet1|index|products?|links?|how to fill this in|guide|instructions?|readme)$/i;
+const INDEX_SHEETS = /^(sheet1|index|products?|links?|how to fill this in|guide|instructions?|readme|summary|about this file)$/i;
 
 /**
  * Spreadsheet formats are binary containers; a CSV is just text, and SheetJS

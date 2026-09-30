@@ -76,7 +76,7 @@ export default async function SkuPage({
       </div>
 
       {stats.insufficient ? (
-        <div className="rounded-lg border border-[#e8d5ab] bg-[#fdf9f0] p-4 text-[13px]">
+        <div className="rounded-lg border border-warn-line bg-warn-bg p-4 text-[13px]">
           <b>Read this page as anecdote, not measurement.</b> With{" "}
           {stats.verified.n} verified review
           {stats.verified.n === 1 ? "" : "s"} (the bar is{" "}
@@ -138,7 +138,7 @@ export default async function SkuPage({
         title="Customer reviews explorer"
         subtitle={`All ${reviews.length} customer review${reviews.length === 1 ? "" : "s"} for this listing. Search keywords, filter by star rating, or drill down by verified status and problem area.`}
       >
-        <ReviewExplorer reviews={reviews} skuName={sku.name} />
+        <ReviewExplorer reviews={reviews} skuId={sku.id} skuName={sku.name} />
       </Panel>
     </div>
   );

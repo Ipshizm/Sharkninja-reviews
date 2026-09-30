@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { describe, it } from "node:test";
-import { safeNextPath } from "../app/api/login/route";
+import { safeNextPath } from "../lib/auth";
 
 describe("login redirect", () => {
   it("accepts internal paths", () => {

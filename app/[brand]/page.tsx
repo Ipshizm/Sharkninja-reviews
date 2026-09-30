@@ -12,6 +12,7 @@ import { BRANDS, skuById } from "@/lib/skus";
 import type { Brand } from "@/lib/types";
 import { getAllInsights, getSkuInsight } from "@/lib/insights";
 import { ExecutiveBriefing } from "@/components/ExecutiveBriefing";
+import { ExportLinks } from "@/components/ExportLinks";
 import {
   NotEnough,
   Panel,
@@ -65,14 +66,21 @@ export default async function BrandPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/" className="text-[13px] text-ink-60 hover:text-ink">
-          ← All brands
-        </Link>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight">{brand}</h1>
-        <p className="text-[13px] text-ink-60">
-          {stats.all.n} reviews across {stats.skus.length} SKUs
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <Link href="/" className="text-[13px] text-ink-60 hover:text-ink">
+            ← All brands
+          </Link>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">{brand}</h1>
+          <p className="text-[13px] text-ink-60">
+            {stats.all.n} reviews across {stats.skus.length} SKUs
+          </p>
+        </div>
+        <ExportLinks
+          filter={{ brand }}
+          count={stats.all.n}
+          label={`Export ${brand} reviews`}
+        />
       </div>
 
       <RatingComparison verified={stats.verified} all={stats.all} />
@@ -137,7 +145,7 @@ export default async function BrandPage({
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px] text-[13px]">
             <thead>
-              <tr className="border-b border-silver-light text-left text-[11px] uppercase tracking-wide text-ink-60">
+              <tr className="border-b border-line text-left text-[11px] uppercase tracking-wide text-ink-60">
                 <th className="pb-2 font-semibold">SKU</th>
                 <th className="pb-2 text-right font-semibold">Reviews</th>
                 <th className="pb-2 text-right font-semibold">Verified avg</th>
@@ -149,7 +157,7 @@ export default async function BrandPage({
               {stats.skus.map((s) => (
                 <tr
                   key={s.sku.id}
-                  className="border-b border-silver-light/60 last:border-0 hover:bg-silver-bg"
+                  className="border-b border-line-soft last:border-0 hover:bg-canvas"
                 >
                   <td className="py-2.5">
                     <Link
@@ -159,7 +167,7 @@ export default async function BrandPage({
                       {s.sku.name}
                     </Link>
                     {s.insufficient ? (
-                      <span className="ml-2 align-middle text-[11px] font-semibold text-[#8a5a00]">
+                      <span className="ml-2 align-middle text-[11px] font-semibold text-warn">
                         low n
                       </span>
                     ) : null}

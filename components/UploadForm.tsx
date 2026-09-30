@@ -267,7 +267,7 @@ export function UploadForm() {
             }
           }}
           className={`cursor-pointer rounded-lg border-2 border-dashed p-10 text-center transition focus:outline-none focus:ring-2 focus:ring-teal ${
-            dragging ? "border-teal bg-teal-tint" : "border-silver bg-white hover:border-teal"
+            dragging ? "border-teal bg-teal-tint" : "border-line bg-white hover:border-teal"
           }`}
           aria-label="Upload review workbook: Drop file here or press Enter to browse files"
         >
@@ -423,7 +423,7 @@ export function UploadForm() {
           ) : pasteText.trim().length > 0 ? (
             <div
               role="status"
-              className="rounded-md border border-[#e8d5ab] bg-[#fdf9f0] p-3 text-[12px] text-[#8a5a00]"
+              className="rounded-md border border-warn-line bg-warn-bg p-3 text-[12px] text-warn"
             >
               No reviews recognized in this text yet. Make sure it includes star rating lines (e.g. &quot;5.0 out of 5 stars&quot;).
             </div>
@@ -457,13 +457,13 @@ export function UploadForm() {
 function ReportCard({ report }: { report: IngestReport }) {
   const nothingNew = report.inserted === 0 && report.duplicates > 0;
   return (
-    <div className="rounded-lg border border-silver-light bg-white p-5">
+    <div className="rounded-lg border border-line bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-[14px] font-bold">{report.filename}</h3>
         <span
           className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
             nothingNew
-              ? "bg-silver-light text-ink-60"
+              ? "bg-line-soft text-ink-60"
               : "bg-teal-tint text-teal"
           }`}
         >
@@ -503,8 +503,8 @@ function ReportCard({ report }: { report: IngestReport }) {
       ) : null}
 
       {report.warnings.length > 0 ? (
-        <div className="mt-4 rounded-md border border-[#e8d5ab] bg-[#fdf9f0] p-3">
-          <p className="text-[12px] font-bold uppercase tracking-wide text-[#8a5a00]">
+        <div className="mt-4 rounded-md border border-warn-line bg-warn-bg p-3">
+          <p className="text-[12px] font-bold uppercase tracking-wide text-warn">
             {report.warnings.length} thing
             {report.warnings.length === 1 ? "" : "s"} to look at
           </p>
@@ -513,7 +513,7 @@ function ReportCard({ report }: { report: IngestReport }) {
               <li key={i}>{warningLabel(w)}</li>
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-[#8a5a00]">
+          <p className="mt-2 text-[11px] text-warn">
             These were imported anyway - they are notes on the paste, not errors.
           </p>
         </div>
@@ -527,7 +527,7 @@ function ReportCard({ report }: { report: IngestReport }) {
         <table className="mt-4 w-full text-[13px]" aria-label="Per product breakdown">
           <caption className="sr-only">Breakdown of parsed and inserted reviews per product SKU</caption>
           <thead>
-            <tr className="border-b border-silver-light/70 text-left text-[11px] uppercase tracking-wider text-ink-60">
+            <tr className="border-b border-line-soft text-left text-[11px] uppercase tracking-wider text-ink-60">
               <th scope="col" className="py-1.5 font-semibold">Product</th>
               <th scope="col" className="py-1.5 text-right font-semibold">Parsed</th>
               <th scope="col" className="py-1.5 text-right font-semibold">New</th>
@@ -535,7 +535,7 @@ function ReportCard({ report }: { report: IngestReport }) {
           </thead>
           <tbody>
             {report.perSku.map((s) => (
-              <tr key={s.skuId} className="border-t border-silver-light/70">
+              <tr key={s.skuId} className="border-t border-line-soft">
                 <td className="py-1.5">{s.name}</td>
                 <td className="tabular py-1.5 text-right text-ink-60">
                   {s.parsed} parsed

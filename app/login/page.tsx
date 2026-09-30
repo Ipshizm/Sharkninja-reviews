@@ -15,7 +15,7 @@ export default async function LoginPage({
       <form
         action="/api/login"
         method="post"
-        className="mt-6 rounded-lg border border-silver-light bg-white p-5"
+        className="mt-6 rounded-lg border border-line bg-white p-5"
       >
         <input type="hidden" name="next" value={next ?? "/"} />
         <label
@@ -30,7 +30,7 @@ export default async function LoginPage({
           type="password"
           autoFocus
           required
-          className="mt-2 w-full rounded-md border border-silver px-3 py-2 text-[14px] outline-none focus:border-teal"
+          className="mt-2 w-full rounded-md border border-line px-3 py-2 text-[14px] outline-none focus:border-teal"
         />
         {error === "unconfigured" ? (
           <p className="mt-3 text-[13px] text-red-700">

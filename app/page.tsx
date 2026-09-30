@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { portfolio, reviewsForSku } from "@/lib/aggregate";
 import { loadReviews } from "@/lib/data";
-import { snapshotGeneratedAt, usingSnapshot } from "@/lib/store";
+import { usingSnapshot } from "@/lib/store";
 import { getAllInsights, getSkuInsight } from "@/lib/insights";
 import { skuById } from "@/lib/skus";
 import { ExecutiveBriefing } from "@/components/ExecutiveBriefing";
+import { ExportLinks } from "@/components/ExportLinks";
 import { MasterSkuTable } from "@/components/MasterSkuTable";
 import {
   Panel,
@@ -68,14 +69,7 @@ export default async function Home() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <a
-            download
-            href="/api/template?format=xlsx&blank=1"
-            className="rounded-lg border border-line bg-surface px-3 py-1.5 text-[12px] font-semibold text-ink hover:bg-canvas"
-            title="Download blank import template (.xlsx)"
-          >
-            Download Template
-          </a>
+          <ExportLinks filter={{}} count={reviews.length} label="Export all reviews" />
           <Link
             href="/upload"
             className="rounded-lg bg-teal px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[color:var(--color-teal-bright)]"
@@ -87,13 +81,11 @@ export default async function Home() {
 
       {usingSnapshot() ? (
         <p className="rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[12px] text-ink-60">
-          Snapshot of the export collected{" "}
+          {/* Dated from the reviews themselves: the seed's own generatedAt
+              stayed at 8 September when later reviews were bundled in. */}
+          Read-only snapshot, newest review{" "}
           <span className="font-semibold text-ink">
-            {new Date(snapshotGeneratedAt).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
+            {range ? formatDay(range.to) : "none"}
           </span>
           . Connect PostgreSQL (Neon) to import new workbooks from the browser.
         </p>
@@ -193,6 +185,15 @@ export default async function Home() {
       </Panel>
     </div>
   );
+}
+
+function formatDay(iso: string) {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 function formatMonth(iso: string) {

@@ -69,3 +69,25 @@ export function checkPassword(input: string): boolean {
 
 export const SESSION_COOKIE = COOKIE;
 export const SESSION_MAX_AGE = TTL_DAYS * 24 * 60 * 60;
+
+/**
+ * Where to send someone after signing in: an internal path, or home. Lives
+ * here rather than in the login route because a route file may only export
+ * its handlers, and `npm run build:webpack` fails type-checking on anything
+ * else.
+ */
+export function safeNextPath(value: string): string {
+  if (!value.startsWith("/") || value.startsWith("//")) return "/";
+
+  // URL parsing also catches backslash and control-character variants such as
+  // `/\\evil.example`, which browsers normalize into cross-origin URLs.
+  try {
+    const base = "https://local.invalid";
+    const destination = new URL(value, base);
+    return destination.origin === base
+      ? `${destination.pathname}${destination.search}${destination.hash}`
+      : "/";
+  } catch {
+    return "/";
+  }
+}

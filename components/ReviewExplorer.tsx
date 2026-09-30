@@ -1,18 +1,24 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import {
+  filterReviews,
+  type ReviewFilter,
+  type SortOption,
+  type VerifiedFilter,
+} from "@/lib/filter";
 import type { Bucket, Review } from "@/lib/types";
-
-type SortOption = "newest" | "oldest" | "lowest" | "highest";
-type VerifiedFilter = "all" | "verified" | "unverified";
+import { ExportLinks } from "./ExportLinks";
 
 const PAGE_SIZE = 15;
 
 export function ReviewExplorer({
   reviews,
+  skuId,
   skuName,
 }: {
   reviews: Review[];
+  skuId: string;
   skuName: string;
 }) {
   const searchInputId = useId();
@@ -49,48 +55,20 @@ export function ReviewExplorer({
     return reviews.filter((r) => r.verified).length;
   }, [reviews]);
 
-  // Filter and sort reviews
-  const filtered = useMemo(() => {
-    let list = reviews;
-
-    // Search query filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (r) =>
-          r.title.toLowerCase().includes(q) ||
-          r.body.toLowerCase().includes(q) ||
-          r.reviewer.toLowerCase().includes(q) ||
-          (r.variant && r.variant.toLowerCase().includes(q)),
-      );
-    }
-
-    // Rating filter
-    if (selectedRating !== "all") {
-      list = list.filter((r) => r.rating === selectedRating);
-    }
-
-    // Verified purchase filter
-    if (verifiedFilter === "verified") {
-      list = list.filter((r) => r.verified);
-    } else if (verifiedFilter === "unverified") {
-      list = list.filter((r) => !r.verified);
-    }
-
-    // Bucket filter
-    if (selectedBucket !== "all") {
-      list = list.filter((r) => r.buckets.includes(selectedBucket as Bucket));
-    }
-
-    // Sorting
-    return list.slice().sort((a, b) => {
-      if (sortBy === "newest") return b.reviewDate.localeCompare(a.reviewDate);
-      if (sortBy === "oldest") return a.reviewDate.localeCompare(b.reviewDate);
-      if (sortBy === "lowest") return a.rating - b.rating || b.reviewDate.localeCompare(a.reviewDate);
-      if (sortBy === "highest") return b.rating - a.rating || b.reviewDate.localeCompare(a.reviewDate);
-      return 0;
-    });
-  }, [reviews, searchQuery, selectedRating, verifiedFilter, selectedBucket, sortBy]);
+  // The same filter the export route applies, so a download holds exactly
+  // the rows on screen.
+  const filter: ReviewFilter = useMemo(
+    () => ({
+      skuId,
+      q: searchQuery,
+      rating: selectedRating === "all" ? undefined : selectedRating,
+      verified: verifiedFilter,
+      bucket: selectedBucket === "all" ? undefined : (selectedBucket as Bucket),
+      sort: sortBy,
+    }),
+    [skuId, searchQuery, selectedRating, verifiedFilter, selectedBucket, sortBy],
+  );
+  const filtered = useMemo(() => filterReviews(reviews, filter), [reviews, filter]);
 
   // Reset page when filters change
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -303,16 +281,17 @@ export function ReviewExplorer({
       </div>
 
       {/* Result Status Bar */}
-      <div className="flex items-center justify-between text-[12px] text-ink-60 border-t border-line-soft pt-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-[12px] text-ink-60 border-t border-line-soft pt-2">
         <span>
           Showing <b>{filtered.length}</b> of {reviews.length} reviews
           {hasActiveFilters ? " (filtered)" : ""}
+          {totalPages > 1 ? ` · page ${currentPage} of ${totalPages}` : ""}
         </span>
-        {totalPages > 1 ? (
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-        ) : null}
+        <ExportLinks
+          filter={filter}
+          count={filtered.length}
+          label={hasActiveFilters ? `Download these ${filtered.length}` : "Download all"}
+        />
       </div>
 
       {/* Reviews List */}
@@ -331,7 +310,7 @@ export function ReviewExplorer({
           </button>
         </div>
       ) : (
-        <ul className="divide-y divide-silver-light">
+        <ul className="divide-y divide-line">
           {paginatedReviews.map((r) => {
             const isExpanded = expandedReviews[r.hash] ?? false;
             const isLong = (r.body?.length ?? 0) > 320;

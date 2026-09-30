@@ -30,6 +30,8 @@
   --color-teal-bright: #0ec1ae;
   --color-teal-tint: #e7f6f3;
   --color-teal-line: #a9dcd3;
+  /* Hover on teal buttons, and teal text sitting on the teal tint. */
+  --color-teal-dark: #0b6357;
 
   /* Ink and surfaces */
   --color-ink: #000000;

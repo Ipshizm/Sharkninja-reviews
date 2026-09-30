@@ -4,25 +4,10 @@ import {
   createSessionValue,
   SESSION_COOKIE,
   SESSION_MAX_AGE,
+  safeNextPath,
 } from "@/lib/auth";
 
 export const runtime = "nodejs";
-
-export function safeNextPath(value: string): string {
-  if (!value.startsWith("/") || value.startsWith("//")) return "/";
-
-  // URL parsing also catches backslash and control-character variants such as
-  // `/\\evil.example`, which browsers normalize into cross-origin URLs.
-  try {
-    const base = "https://local.invalid";
-    const destination = new URL(value, base);
-    return destination.origin === base
-      ? `${destination.pathname}${destination.search}${destination.hash}`
-      : "/";
-  } catch {
-    return "/";
-  }
-}
 
 export async function POST(req: Request) {
   const form = await req.formData();
