@@ -1,50 +1,44 @@
 @import "tailwindcss";
 
 /**
- * SharkNinja India brand theme.
+ * SharkNinja brand theme (Master Corporate Brand Guidelines V5).
  *
- * Sourced from the live India storefront (sharkninja.in, which serves both
- * ninjakitchen.in and sharkclean.in from one Shopify theme):
+ * Corporate palette: Black, White and Silver (#bbbdc0), with Teal (#00a5af) as
+ * the single accent. Teal on white is only 2.9:1, so it is used for fills,
+ * bars, dots and borders. Teal TEXT uses --color-teal-text (5:1), and teal
+ * buttons carry black text.
  *
- *   --accent-color        #d85827   the copper-orange
- *   --accent-color-darken #973e1b
- *   --link-color          #000000   links are black, hover goes orange
- *   --pr-addtocart-color  #0ec1ae   the bright teal
- *   --jdgm-primary-color  #108474   the deep teal
- *   --heading-color       #000000
- *
- * That "links are black, hover orange" rule is the reason orange is free to
- * carry meaning here. On a sentiment dashboard the strongest brand colour
- * should mean something, so orange is negative sentiment throughout and
- * interaction stays black — exactly the storefront's own hierarchy.
+ * Orange is the one functional alert colour. It marks negative sentiment and
+ * nothing else, which is why interaction stays black and teal.
  */
 @theme {
-  /* Brand */
+  /* Alert (negative sentiment only) */
   --color-brand: #d85827;
   --color-brand-dark: #973e1b;
   --color-brand-tint: #fdf0e9;
   --color-brand-line: #f2c9b5;
 
-  /* Teal — the other half of the SharkNinja palette */
-  --color-teal: #108474;
-  --color-teal-bright: #0ec1ae;
-  --color-teal-tint: #e7f6f3;
-  --color-teal-line: #a9dcd3;
-  /* Hover on teal buttons, and teal text sitting on the teal tint. */
-  --color-teal-dark: #0b6357;
+  /* Teal: the SharkNinja accent */
+  --color-teal: #00a5af;
+  --color-teal-tint: #e5f6f7;
+  --color-teal-line: #99dbdf;
+  /* Teal for text and hover states: AA contrast on white and on the tint. */
+  --color-teal-text: #007a82;
+  --color-teal-dark: #006a72;
+  --color-silver: #bbbdc0;
 
   /* Ink and surfaces */
   --color-ink: #000000;
   --color-ink-60: #5c5c5c;
-  --color-ink-40: #7b7b7b;
+  --color-ink-40: #6b6b6b;
   --color-line: #e4e4e4;
   --color-line-soft: #f1f1f1;
   --color-surface: #ffffff;
   --color-canvas: #f7f7f7;
 
-  /* Sentiment — one mapping used by every chart on the site */
-  --color-positive: #108474;
-  --color-neutral: #c9c9c9;
+  /* Sentiment: one mapping used by every chart on the site */
+  --color-positive: #00a5af;
+  --color-neutral: #bbbdc0;
   --color-negative: #d85827;
 
   /* Warning (low sample size) */
@@ -52,12 +46,16 @@
   --color-warn-bg: #fdf6e8;
   --color-warn-line: #e8d5ab;
 
+  /* Watch items: neutral, from the corporate palette */
+  --color-watch-bg: #f1f2f3;
+  --color-watch-line: #bbbdc0;
+
   /**
-   * Gotham is the storefront's typeface, but it is licensed from Hoefler&Co
-   * and cannot be self-hosted here. Montserrat is the closest freely licensed
-   * geometric sans and carries the Gotham feel on headings; Plus Jakarta Sans
-   * is SharkNinja's own corporate typeface (sharkninja.com) and has the
-   * tabular figures the tables need.
+   * Gotham (Proxima Nova as the digital fallback) is the brand typeface but is
+   * licensed and cannot be self-hosted here. Montserrat is the closest freely
+   * licensed geometric sans; Plus Jakarta Sans carries body text and has the
+   * tabular figures the tables need. Swap these two variables when licensed
+   * font files are available.
    */
   --font-display: var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui,
     sans-serif;
@@ -92,9 +90,18 @@ h3,
   font-feature-settings: "tnum" 1;
 }
 
-/* Consistent focus ring — keyboard users should never lose their place. */
-:where(a, button, select, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brand);
+/* Consistent focus ring: keyboard users should never lose their place.
+   Unlayered, so it beats the outline-hidden / outline-none utilities that
+   used to hide it on inputs and tabs. */
+:where(a, button, select, summary, input, textarea, [tabindex], [role="tab"]):focus-visible {
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

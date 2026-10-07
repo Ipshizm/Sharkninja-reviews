@@ -47,7 +47,10 @@ describe("insights report data", () => {
 
   it("dates the analysis per listing, not by the insight file's stamp", () => {
     assert.ok(all.insightsWritten);
-    const days = all.ranked.map((r) => r.insight!.generatedAt.slice(0, 10)).sort();
+    const days = all.ranked
+      .filter((r) => r.insight)
+      .map((r) => r.insight!.generatedAt.slice(0, 10))
+      .sort();
     assert.deepEqual(all.insightsWritten, { from: days[0], to: days.at(-1) });
   });
 

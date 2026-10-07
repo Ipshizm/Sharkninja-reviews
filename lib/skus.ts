@@ -4,7 +4,8 @@ export type Sku = {
   id: string; // url slug + storage key
   name: string; // as listed in the workbook index sheet
   brand: Brand;
-  asin: string;
+  /** Amazon.in ASIN. Optional so a product can be registered before its listing is confirmed. */
+  asin?: string;
   model?: string;
   /**
    * What reviewers call this device when they are not using its name.
@@ -73,6 +74,14 @@ export const SKUS: Sku[] = [
     sheetNames: ["DoubleStack", "Double Stack"],
   },
   {
+    id: "ninja-crispi",
+    name: "Ninja Crispi",
+    brand: "Ninja",
+    asin: "B0HD7SCDKQ",
+    categoryTokens: ["fryer", "airfryer"],
+    sheetNames: ["Crispi", "CRISPi"],
+  },
+  {
     id: "shark-flex-breeze",
     name: "Shark Flex Breeze",
     brand: "Shark",
@@ -136,7 +145,9 @@ export const SKUS: Sku[] = [
 export const BRANDS: Brand[] = ["Ninja", "Shark"];
 
 export function amazonUrl(sku: Sku): string {
-  return `https://www.amazon.in/dp/${sku.asin}`;
+  return sku.asin
+    ? `https://www.amazon.in/dp/${sku.asin}`
+    : `https://www.amazon.in/s?k=${encodeURIComponent(sku.name)}`;
 }
 
 export function skuById(id: string): Sku | undefined {
@@ -149,10 +160,51 @@ export function skusForBrand(brand: Brand): Sku[] {
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
 
-/** Resolve a worksheet tab name to a SKU. Returns undefined if unmapped. */
+/** Case, spacing and punctuation all dropped: "Power-Detect VC" -> "powerdetectvc". */
+const squash = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** The name without the brand: "Ninja Crispi" -> "crispi". */
+const coreName = (sku: Sku) =>
+  squash(sku.name.replace(/^(sharkninja|ninja|shark)\s+/i, ""));
+
+/**
+ * Resolve a worksheet tab name to a SKU. Returns undefined if unmapped.
+ *
+ * Tab names are typed by hand and differ between exports, so after the exact
+ * list in sheetNames this also accepts the same name written differently
+ * ("Crispi", "Ninja Crispi", "crispi-glass"), the model code, the ASIN and the
+ * id. A loose match has to be unambiguous: "Detect" fits two vacuums, so it
+ * resolves to nothing and gets reported rather than guessed at.
+ */
 export function skuForSheet(sheetName: string): Sku | undefined {
   const n = norm(sheetName);
-  return SKUS.find((s) => s.sheetNames.some((t) => norm(t) === n));
+  const exact = SKUS.find((s) => s.sheetNames.some((t) => norm(t) === n));
+  if (exact) return exact;
+
+  const k = squash(sheetName);
+  if (!k) return undefined;
+  const bare = k.replace(/^(sharkninja|ninja|shark)/, "") || k;
+
+  const keysOf = (s: Sku) =>
+    [
+      squash(s.id),
+      squash(s.name),
+      coreName(s),
+      ...(s.model ? [squash(s.model)] : []),
+      ...(s.asin ? [squash(s.asin)] : []),
+      ...s.sheetNames.map(squash),
+    ].filter(Boolean);
+
+  const same = SKUS.filter((s) => keysOf(s).some((key) => key === k || key === bare));
+  if (same.length === 1) return same[0];
+  if (same.length > 1) return undefined;
+
+  if (bare.length < 4) return undefined;
+  const near = SKUS.filter((s) => {
+    const core = coreName(s);
+    return core.includes(bare) || bare.startsWith(core);
+  });
+  return near.length === 1 ? near[0] : undefined;
 }
 
 const BASE_TOKENS = ["ninja", "shark", "sharkninja", "amazon"];
@@ -160,7 +212,7 @@ const BASE_TOKENS = ["ninja", "shark", "sharkninja", "amazon"];
 function tokensOf(sku: Sku): string[] {
   return [
     ...sku.name.toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean),
-    sku.asin.toLowerCase(),
+    ...(sku.asin ? [sku.asin.toLowerCase()] : []),
     ...(sku.model ? [sku.model.toLowerCase()] : []),
     ...(sku.categoryTokens ?? []),
   ];

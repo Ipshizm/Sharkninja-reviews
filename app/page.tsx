@@ -31,7 +31,7 @@ export default async function Home() {
         </p>
         <Link
           href="/upload"
-          className="mt-5 inline-block rounded-md bg-teal px-4 py-2 text-[14px] font-semibold text-white hover:bg-teal-dark"
+          className="mt-5 inline-block rounded-md bg-teal px-4 py-2 text-[14px] font-semibold text-ink hover:bg-teal-dark hover:text-white"
         >
           Import data
         </Link>
@@ -74,7 +74,7 @@ export default async function Home() {
           <ExportLinks filter={{}} count={reviews.length} label="Export all reviews" />
           <Link
             href="/upload"
-            className="rounded-lg bg-teal px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[color:var(--color-teal-bright)]"
+            className="rounded-lg bg-teal px-3 py-1.5 text-[12px] font-semibold text-ink transition hover:bg-teal-dark hover:text-white"
           >
             Import Data
           </Link>
@@ -131,13 +131,6 @@ export default async function Home() {
         />
       </div>
 
-      {/* AI Executive Intelligence Briefing */}
-      <ExecutiveBriefing
-        insights={enrichedInsights}
-        model={rawInsights.model}
-        generatedAt={rawInsights.generatedAt}
-      />
-
       {/* Brand Rollups */}
       <div className="grid gap-5 sm:grid-cols-2">
         {port.brands.map((t) => (
@@ -147,7 +140,7 @@ export default async function Home() {
             className="group rounded-xl border border-line bg-surface p-5 transition hover:border-ink hover:shadow-xs"
           >
             <div className="flex items-baseline justify-between">
-              <h2 className="text-xl font-bold tracking-tight group-hover:text-teal">
+              <h2 className="text-xl font-bold tracking-tight group-hover:text-teal-text">
                 {t.brand}
               </h2>
               <span className="text-[12px] text-ink-40">
@@ -171,7 +164,7 @@ export default async function Home() {
               <SentimentLegend s={t.verified} />
             </div>
 
-            <p className="mt-4 text-[13px] font-semibold text-teal">
+            <p className="mt-4 text-[13px] font-semibold text-teal-text">
               View all {t.brand} products →
             </p>
           </Link>
@@ -185,6 +178,13 @@ export default async function Home() {
       >
         <MasterSkuTable rows={port.skus} />
       </Panel>
+
+      {/* AI briefing sits after the numbers it interprets: KPIs, brands, ranked table. */}
+      <ExecutiveBriefing
+        insights={enrichedInsights}
+        totalReviews={reviews.length}
+        generatedAt={rawInsights.generatedAt}
+      />
     </div>
   );
 }

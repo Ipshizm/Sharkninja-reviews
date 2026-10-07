@@ -373,9 +373,25 @@ describe("a refused import", () => {
     assert.equal(out.reviews.length, 1, "the good tab still parses");
   });
 
-  it("refuses before the store is touched", async () => {
+  it("imports the recognised tabs and warns about the one it could not place", async () => {
+    const report = await ingestBuffer(mixedWorkbook(), "guard.xlsx");
+    assert.deepEqual(report.unmappedSheets, ["Ninja Brand New SKU"]);
+    assert.equal(report.parsed, 1);
+    const w = report.warnings.find((x) => x.kind === "unrecognised-sheet");
+    assert.ok(w, "the unplaced tab is reported");
+    assert.match(w.detail, /Ninja Brand New SKU/);
+  });
+
+  it("refuses before the store is touched when no tab can be placed", async () => {
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      wb,
+      XLSX.utils.aoa_to_sheet([["something"], ["else"]]),
+      "Ninja Brand New SKU",
+    );
+    const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" }) as Buffer;
     await assert.rejects(
-      () => ingestBuffer(mixedWorkbook(), "guard.xlsx"),
+      () => ingestBuffer(buf, "none.xlsx"),
       (err: unknown) => {
         assert.ok(err instanceof UnmappedSheetsError);
         assert.deepEqual(err.sheets, ["Ninja Brand New SKU"]);

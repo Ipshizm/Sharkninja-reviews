@@ -90,15 +90,42 @@ export async function POST(req: Request) {
       );
     }
 
+    // Each file stands alone: one bad file must not hide that an earlier one
+    // was already saved, so failures are reported per file.
     const reports = [];
+    const failures: { filename: string; error: string; unmappedSheets?: string[] }[] = [];
     for (const f of files) {
-      reports.push(await ingestBuffer(f.buf, f.name));
+      try {
+        reports.push(await ingestBuffer(f.buf, f.name));
+      } catch (err) {
+        if (err instanceof ReadOnlyStoreError) throw err;
+        failures.push({
+          filename: f.name,
+          error: err instanceof Error ? err.message : "Unknown error",
+          unmappedSheets: err instanceof UnmappedSheetsError ? err.sheets : undefined,
+        });
+      }
     }
 
-    revalidatePath("/", "layout");
-    revalidatePath("/upload");
+    if (reports.length > 0) {
+      revalidatePath("/", "layout");
+      revalidatePath("/upload");
+    }
 
-    return NextResponse.json({ ok: true, reports });
+    if (reports.length === 0 && failures.length === 1) {
+      const only = failures[0];
+      return NextResponse.json(
+        { error: only.error, unmappedSheets: only.unmappedSheets, failures },
+        { status: only.unmappedSheets ? 422 : 400 },
+      );
+    }
+    if (reports.length === 0) {
+      return NextResponse.json(
+        { error: "None of the files could be imported.", failures },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json({ ok: true, reports, failures });
   } catch (err) {
     // Raised before anything is written, so "nothing was imported" is accurate.
     if (err instanceof InvalidSkuError || err instanceof EmptyImportError) {

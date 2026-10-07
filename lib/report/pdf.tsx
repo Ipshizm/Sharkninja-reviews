@@ -36,10 +36,10 @@ const C = {
   brandDark: "#973e1b",
   brandTint: "#fdf0e9",
   brandLine: "#f2c9b5",
-  teal: "#108474",
-  tealDark: "#0b6357",
-  tealTint: "#e7f6f3",
-  tealLine: "#a9dcd3",
+  teal: "#00a5af",
+  tealDark: "#006a72",
+  tealTint: "#e5f6f7",
+  tealLine: "#99dbdf",
   ink: "#000000",
   ink60: "#5c5c5c",
   ink40: "#7b7b7b",
@@ -911,7 +911,7 @@ function SkuDetail({
           <ToneChip tone={section.tone} />
         </View>
         <Text style={{ fontSize: 7.5, color: C.ink40, marginTop: 1 }}>
-          {sku.brand} · ASIN {sku.asin}
+          {sku.brand}{sku.asin ? ` · ASIN ${sku.asin}` : ""}
           {sku.model ? ` · ${sku.model}` : ""}
         </Text>
 

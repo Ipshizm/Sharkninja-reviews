@@ -72,7 +72,13 @@ describe("export goes back in through the real import path", () => {
   after(() => {
     process.chdir(cwd);
     resetStoreCacheForTesting();
-    rmSync(dir, { recursive: true, force: true });
+    // Windows keeps the SQLite file locked until the process exits; the OS
+    // clears the temp directory later, so a failed delete is not a test failure.
+    try {
+      rmSync(dir, { recursive: true, force: true });
+    } catch {
+      /* leave it to the OS */
+    }
   });
 
   /**

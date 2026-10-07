@@ -13,7 +13,7 @@ export function ThemeList({
   total?: number;
 }) {
   if (themes.length === 0) return null;
-  const colour = tone === "positive" ? "#108474" : "#d85827";
+  const colour = tone === "positive" ? "#00a5af" : "#d85827";
   return (
     <div className="mt-4 border-t border-line pt-4">
       <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-ink-60">
@@ -83,7 +83,7 @@ export function BucketBars({
             colour: "#d85827",
             label: "Share of this SKU's negative reviews that name the problem",
           },
-          { colour: "#c9c9c9", label: "Negative, but names no cause" },
+          { colour: "#bbbdc0", label: "Negative, but names no cause" },
         ]}
         note={`Bars run 0–100% of the ${total} negative review${total === 1 ? "" : "s"}. They add up to more than 100% because one review can name several problems — "arrived damaged and nobody replied" is counted twice.`}
       />
@@ -111,7 +111,7 @@ export function BucketBars({
                       className="relative h-6 rounded-l"
                       style={{
                         width: `${r.pct}%`,
-                        background: grey ? "#c9c9c9" : "#d85827",
+                        background: grey ? "#bbbdc0" : "#d85827",
                       }}
                       role="img"
                       aria-label={`${r.pct.toFixed(0)} percent`}
@@ -181,16 +181,16 @@ const TONE_BADGE: Record<
   },
   watch: {
     label: "Watch Item",
-    border: "border-[#bee3f8]",
-    bg: "bg-[#ebf8ff]",
-    text: "text-[#2b6cb0]",
-    dot: "bg-[#3182ce]",
+    border: "border-watch-line",
+    bg: "bg-watch-bg",
+    text: "text-ink",
+    dot: "bg-ink-60",
   },
   healthy: {
     label: "Healthy Performer",
     border: "border-teal-line",
     bg: "bg-teal-tint",
-    text: "text-teal",
+    text: "text-teal-text",
     dot: "bg-teal",
   },
   unknown: {

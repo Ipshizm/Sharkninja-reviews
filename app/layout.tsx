@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Plus_Jakarta_Sans } from "next/font/google";
 import Link from "next/link";
+import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
 
 // globals.css names these variables in --font-display and --font-sans. Until
@@ -28,8 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${montserrat.variable} ${jakarta.variable}`}>
       <body className="min-h-screen">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-ink focus:px-3 focus:py-2 focus:text-[13px] focus:font-semibold focus:text-white"
+        >
+          Skip to content
+        </a>
         <header className="border-b border-line bg-white">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-4">
             <Link href="/" className="flex items-baseline gap-2.5">
               <span className="text-[15px] font-bold tracking-tight">
                 SharkNinja India
@@ -38,25 +45,10 @@ export default function RootLayout({
                 Review Sentiment
               </span>
             </Link>
-            <nav className="flex items-center gap-4 text-[13px] sm:gap-5">
-              <Link href="/" className="text-ink-60 hover:text-ink">
-                Dashboard
-              </Link>
-              <a
-                download
-                href="/api/template?format=xlsx&blank=1"
-                className="text-ink-60 hover:text-ink"
-                title="Download blank Excel import template"
-              >
-                Template
-              </a>
-              <Link href="/upload" className="text-ink-60 hover:text-ink">
-                Import data
-              </Link>
-            </nav>
+            <SiteNav />
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-5 py-8">{children}</main>
+        <main id="main" tabIndex={-1} className="mx-auto max-w-6xl px-5 py-8 focus:outline-none">{children}</main>
       </body>
     </html>
   );

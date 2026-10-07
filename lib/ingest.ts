@@ -17,10 +17,9 @@ export function toReviews(parsed: ParsedReview[]): Review[] {
 }
 
 /**
- * A tab that matches no SKU means those reviews vanish. Raised before anything
- * is written, so the message the caller shows ("nothing was imported") is true:
- * the previous version inserted the good sheets first and then reported the
- * import as refused.
+ * Raised when no tab in the file matches a SKU, so there is nothing to import.
+ * Thrown before anything is written, so "nothing was imported" is true. A file
+ * with some recognised tabs is not an error: see the warning in validate().
  */
 export class UnmappedSheetsError extends Error {
   constructor(
@@ -28,7 +27,7 @@ export class UnmappedSheetsError extends Error {
     readonly filename: string,
   ) {
     super(
-      `Unrecognised sheet${sheets.length > 1 ? "s" : ""} in ${filename}: ${sheets.join(", ")}. Nothing was imported. Either use the model template, or add the tab name to that SKU's sheetNames in lib/skus.ts.`,
+      `Unrecognised sheet${sheets.length > 1 ? "s" : ""} in ${filename}: ${sheets.join(", ")}. Nothing was imported. Name each tab after its product (for example "Ninja Crispi"), or start from the blank template on the Import page. If this is a new product, ask the dashboard maintainer to add it.`,
     );
     this.name = "UnmappedSheetsError";
   }
@@ -96,7 +95,7 @@ async function commitParsedReviews({
     perSku,
     dateRange:
       dates.length > 0 ? { from: dates[0], to: dates[dates.length - 1] } : null,
-    warnings: validate(deduped, withinFileDuplicates, skippedRows),
+    warnings: validate(deduped, withinFileDuplicates, skippedRows, unmappedSheets),
   };
 
   await store.recordImport({
@@ -118,8 +117,11 @@ export async function ingestBuffer(
 ): Promise<IngestReport> {
   const parsedWb = parseWorkbook(buf);
 
-  // Checked before the store is touched: a refused import must leave nothing behind.
-  if (parsedWb.unmappedSheets.length > 0) {
+  // Refused, before the store is touched, only when nothing in the file could
+  // be placed. If some tabs are recognised the rest are imported and the
+  // unrecognised ones come back as a warning, so one new product in a monthly
+  // export does not hold up the other tabs.
+  if (parsedWb.unmappedSheets.length > 0 && parsedWb.sheets.length === 0) {
     throw new UnmappedSheetsError(parsedWb.unmappedSheets, filename);
   }
 

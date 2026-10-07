@@ -38,7 +38,7 @@ export default async function UploadPage() {
 
       {snapshot ? (
         <div className="rounded-lg border border-warn-line bg-warn-bg p-4 text-[13px] text-warn">
-          <b>Showing bundled snapshot (read-only mode).</b> Set DATABASE_URL or run with SQLite to persist new imports.
+          <b>Showing bundled snapshot (read-only mode).</b> Connect a database (DATABASE_URL) or run locally to save new imports.
         </div>
       ) : null}
 
@@ -55,7 +55,7 @@ export default async function UploadPage() {
         {reviews.length > 0 ? (
           <Link
             href="/"
-            className="inline-block rounded-md bg-teal px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-[color:var(--color-teal-bright)]"
+            className="inline-block rounded-md bg-teal px-4 py-2 text-[13px] font-semibold text-ink transition hover:bg-teal-dark hover:text-white"
           >
             Open the dashboard
           </Link>
@@ -68,14 +68,16 @@ export default async function UploadPage() {
 
       {imports.length > 0 ? (
         <Panel title="Import history" subtitle="Most recent first">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px] text-[13px]">
+            <caption className="sr-only">Previous imports, most recent first</caption>
             <thead>
               <tr className="border-b border-line text-left text-[11px] uppercase tracking-wide text-ink-60">
-                <th className="pb-2 font-semibold">When</th>
-                <th className="pb-2 font-semibold">File</th>
-                <th className="pb-2 text-right font-semibold">Parsed</th>
-                <th className="pb-2 text-right font-semibold">Added</th>
-                <th className="pb-2 text-right font-semibold">Skipped</th>
+                <th scope="col" className="pb-2 font-semibold">When</th>
+                <th scope="col" className="pb-2 font-semibold">File</th>
+                <th scope="col" className="pb-2 text-right font-semibold">Parsed</th>
+                <th scope="col" className="pb-2 text-right font-semibold">Added</th>
+                <th scope="col" className="pb-2 text-right font-semibold">Already had</th>
               </tr>
             </thead>
             <tbody>
@@ -96,6 +98,7 @@ export default async function UploadPage() {
               ))}
             </tbody>
           </table>
+        </div>
         </Panel>
       ) : null}
     </div>

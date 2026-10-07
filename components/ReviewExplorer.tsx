@@ -126,6 +126,7 @@ export function ReviewExplorer({
                 setSearchQuery("");
                 setCurrentPage(1);
               }}
+              aria-label="Clear search"
               className="absolute right-3 top-2.5 text-[12px] text-ink-40 hover:text-ink cursor-pointer"
             >
               ✕
@@ -133,7 +134,7 @@ export function ReviewExplorer({
           ) : null}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <label htmlFor={sortSelectId} className="shrink-0 text-[12px] text-ink-60">
             Sort by:
           </label>
@@ -157,13 +158,14 @@ export function ReviewExplorer({
       {/* Filter Chips Toolbar */}
       <div className="flex flex-wrap items-center gap-2 pt-1">
         {/* Star Rating Pills */}
-        <div className="flex items-center gap-1 rounded-lg border border-line bg-canvas p-1">
+        <div className="flex flex-wrap items-center gap-1 rounded-lg border border-line bg-canvas p-1">
           <button
             type="button"
             onClick={() => {
               setSelectedRating("all");
               setCurrentPage(1);
             }}
+            aria-pressed={selectedRating === "all"}
             className={`cursor-pointer rounded px-2.5 py-1 text-[11px] font-semibold transition ${
               selectedRating === "all"
                 ? "bg-white text-ink shadow-2xs"
@@ -183,10 +185,11 @@ export function ReviewExplorer({
                   setSelectedRating(isSelected ? "all" : stars);
                   setCurrentPage(1);
                 }}
+                aria-pressed={isSelected}
                 className={`flex items-center gap-1 rounded px-2 py-1 text-[11px] font-semibold transition cursor-pointer ${
                   isSelected
                     ? stars >= 4
-                      ? "bg-teal text-white"
+                      ? "bg-teal text-ink"
                       : stars === 3
                         ? "bg-ink text-white"
                         : "bg-brand text-white"
@@ -201,13 +204,14 @@ export function ReviewExplorer({
         </div>
 
         {/* Verified Purchase Toggle */}
-        <div className="flex items-center gap-1 rounded-lg border border-line bg-canvas p-1">
+        <div className="flex flex-wrap items-center gap-1 rounded-lg border border-line bg-canvas p-1">
           <button
             type="button"
             onClick={() => {
               setVerifiedFilter("all");
               setCurrentPage(1);
             }}
+            aria-pressed={verifiedFilter === "all"}
             className={`cursor-pointer rounded px-2.5 py-1 text-[11px] font-semibold transition ${
               verifiedFilter === "all"
                 ? "bg-white text-ink shadow-2xs"
@@ -222,9 +226,10 @@ export function ReviewExplorer({
               setVerifiedFilter("verified");
               setCurrentPage(1);
             }}
+            aria-pressed={verifiedFilter === "verified"}
             className={`cursor-pointer rounded px-2.5 py-1 text-[11px] font-semibold transition ${
               verifiedFilter === "verified"
-                ? "bg-white text-teal shadow-2xs"
+                ? "bg-white text-teal-text shadow-2xs"
                 : "text-ink-60 hover:text-ink"
             }`}
           >
@@ -236,6 +241,7 @@ export function ReviewExplorer({
               setVerifiedFilter("unverified");
               setCurrentPage(1);
             }}
+            aria-pressed={verifiedFilter === "unverified"}
             className={`cursor-pointer rounded px-2.5 py-1 text-[11px] font-semibold transition ${
               verifiedFilter === "unverified"
                 ? "bg-white text-warn shadow-2xs"
@@ -248,9 +254,10 @@ export function ReviewExplorer({
 
         {/* Bucket Filter (if any buckets exist) */}
         {availableBuckets.length > 0 ? (
-          <div className="flex items-center gap-1 rounded-lg border border-line bg-canvas p-1">
+          <div className="flex flex-wrap items-center gap-1 rounded-lg border border-line bg-canvas p-1">
             <span className="px-2 text-[11px] font-medium text-ink-60">Problem:</span>
             <select
+              aria-label="Filter by problem area"
               value={selectedBucket}
               onChange={(e) => {
                 setSelectedBucket(e.target.value);
@@ -338,7 +345,7 @@ export function ReviewExplorer({
                   </span>
 
                   {r.verified ? (
-                    <span className="rounded-full border border-teal-line bg-teal-tint px-2 py-0.2 text-[10px] font-semibold text-teal">
+                    <span className="rounded-full border border-teal-line bg-teal-tint px-2 py-0.2 text-[10px] font-semibold text-teal-text">
                       Verified purchase
                     </span>
                   ) : (
@@ -361,7 +368,7 @@ export function ReviewExplorer({
                       <button
                         type="button"
                         onClick={() => toggleExpand(r.hash)}
-                        className="mt-1 text-[11px] font-semibold text-teal hover:underline cursor-pointer"
+                        className="mt-1 text-[11px] font-semibold text-teal-text hover:underline cursor-pointer"
                       >
                         {isExpanded ? "Show less" : "Read full review"}
                       </button>
@@ -403,7 +410,7 @@ export function ReviewExplorer({
 
       {/* Pagination Controls */}
       {totalPages > 1 ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 border-t border-line pt-4 sm:justify-between">
           <button
             type="button"
             disabled={currentPage === 1}
@@ -413,11 +420,13 @@ export function ReviewExplorer({
             ← Previous
           </button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center justify-center gap-1">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 type="button"
+                aria-label={`Page ${p}`}
+                aria-current={currentPage === p ? "page" : undefined}
                 onClick={() => setCurrentPage(p)}
                 className={`tabular h-8 w-8 rounded-md text-[12px] font-semibold transition cursor-pointer ${
                   currentPage === p

@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import {
   bucketTable,
   cloudFor,
@@ -51,12 +51,13 @@ export default async function SkuPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Link
-            href={`/${brand.toLowerCase()}`}
-            className="text-[13px] text-ink-60 hover:text-ink"
-          >
-            ← {brand}
-          </Link>
+          <Breadcrumbs
+            items={[
+              { label: "Dashboard", href: "/" },
+              { label: brand, href: `/${brand.toLowerCase()}` },
+              { label: sku.name },
+            ]}
+          />
           <div className="mt-1 flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight">{sku.name}</h1>
             {stats.insufficient ? (

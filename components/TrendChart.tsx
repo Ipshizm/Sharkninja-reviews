@@ -32,20 +32,24 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={points}
-            margin={{ top: 8, right: 8, bottom: 4, left: -20 }}
+            margin={{ top: 8, right: 12, bottom: 4, left: 0 }}
           >
             <CartesianGrid stroke="#f1f1f1" vertical={false} />
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 12, fill: "#7b7b7b" }}
+              tick={{ fontSize: 12, fill: "#6b6b6b" }}
               tickLine={false}
               axisLine={{ stroke: "#e4e4e4" }}
             />
             <YAxis
               yAxisId="rating"
+              orientation="left"
+              width={32}
               domain={[1, 5]}
               ticks={[1, 2, 3, 4, 5]}
-              tick={{ fontSize: 12, fill: "#7b7b7b" }}
+              interval={0}
+              tickMargin={4}
+              tick={{ fontSize: 12, fill: "#6b6b6b" }}
               tickLine={false}
               axisLine={false}
             />
@@ -53,7 +57,9 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
                 of the line's way. It is context, not a competing series. */}
             <YAxis
               yAxisId="count"
+              orientation="right"
               domain={[0, maxN * 3]}
+              width={0}
               hide
             />
             <Tooltip
@@ -76,14 +82,15 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
             <ReferenceLine
               yAxisId="rating"
               y={overall}
-              stroke="#7b7b7b"
+              stroke="#6b6b6b"
               strokeDasharray="4 4"
             />
             <Bar
               yAxisId="count"
               dataKey="n"
               name="Verified reviews that month"
-              fill="#e4e4e4"
+              fill="#bbbdc0"
+              fillOpacity={0.55}
               radius={[2, 2, 0, 0]}
               maxBarSize={28}
             />
@@ -92,9 +99,9 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
               type="monotone"
               dataKey="avg"
               name="Verified average"
-              stroke="#d85827"
+              stroke="#00a5af"
               strokeWidth={2.5}
-              dot={{ r: 3.5, fill: "#d85827", strokeWidth: 0 }}
+              dot={{ r: 3.5, fill: "#00a5af", strokeWidth: 0 }}
               activeDot={{ r: 6 }}
             />
           </ComposedChart>
@@ -104,10 +111,10 @@ export function TrendChart({ points }: { points: TrendPoint[] }) {
       <Legend
         className="mt-3 border-t border-line pt-3"
         items={[
-          { colour: "#d85827", label: "Verified average that month (left scale, 1–5)" },
-          { colour: "#e4e4e4", label: "How many verified reviews that month" },
+          { colour: "#00a5af", label: "Verified average that month (left scale, 1–5)" },
+          { colour: "#bbbdc0", label: "How many verified reviews that month" },
           {
-            colour: "#7b7b7b",
+            colour: "#6b6b6b",
             label: "Average across the whole period",
             value: overall.toFixed(2),
           },

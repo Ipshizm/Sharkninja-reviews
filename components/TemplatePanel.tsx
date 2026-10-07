@@ -23,7 +23,7 @@ export function TemplatePanel() {
             <a
               download
               href="/api/template?format=xlsx&blank=1"
-              className="rounded bg-teal px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-[color:var(--color-teal-bright)]"
+              className="rounded bg-teal px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:bg-teal-dark hover:text-white"
               title="Clean spreadsheet with headers only, ready to paste data into"
             >
               .xlsx
@@ -31,7 +31,7 @@ export function TemplatePanel() {
             <a
               download
               href="/api/template?format=csv&blank=1"
-              className="rounded border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:border-teal hover:text-teal"
+              className="rounded border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:border-teal hover:text-teal-text"
               title="Clean CSV with headers only, ready to paste data into"
             >
               .csv
@@ -43,7 +43,7 @@ export function TemplatePanel() {
             <a
               download
               href="/api/template?format=xlsx"
-              className="rounded border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:border-teal hover:text-teal"
+              className="rounded border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:border-teal hover:text-teal-text"
               title="Spreadsheet with example rows and product guide"
             >
               .xlsx
@@ -51,7 +51,7 @@ export function TemplatePanel() {
             <a
               download
               href="/api/template?format=csv"
-              className="rounded border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:border-teal hover:text-teal"
+              className="rounded border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink transition hover:border-teal hover:text-teal-text"
               title="CSV with example rows"
             >
               .csv

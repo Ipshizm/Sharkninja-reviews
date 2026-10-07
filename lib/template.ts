@@ -205,7 +205,7 @@ const EXAMPLE_ROWS = [
 function skuReferenceRows(): string[][] {
   return [
     ["Product", "Brand", "ASIN", "Model", "Also accepted"],
-    ...SKUS.map((s) => [s.name, s.brand, s.asin, s.model ?? "", s.id]),
+    ...SKUS.map((s) => [s.name, s.brand, s.asin ?? "", s.model ?? "", s.id]),
   ];
 }
 

@@ -53,8 +53,8 @@ export function Legend({
 }
 
 export const SENTIMENT_COLOURS = {
-  positive: "#108474",
-  neutral: "#c9c9c9",
+  positive: "#00a5af",
+  neutral: "#bbbdc0",
   negative: "#d85827",
 } as const;
 
@@ -155,7 +155,7 @@ const DIRECTION_STYLE = {
   rising: {
     arrow: "▲",
     word: "Rising",
-    className: "bg-teal-tint text-teal border-teal-line",
+    className: "bg-teal-tint text-teal-text border-teal-line",
   },
   flat: {
     arrow: "▬",

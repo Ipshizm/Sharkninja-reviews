@@ -88,6 +88,11 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
     });
   }, [rows, search, brandFilter, hideLowData, sortField, sortDirection]);
 
+  function ariaSort(field: SortField): "ascending" | "descending" | "none" {
+    if (sortField !== field) return "none";
+    return sortDirection === "asc" ? "ascending" : "descending";
+  }
+
   function renderSortArrow(field: SortField) {
     if (sortField !== field) {
       return <span className="opacity-20 ml-1">↕</span>;
@@ -103,6 +108,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
           <button
             type="button"
             onClick={() => setBrandFilter("all")}
+            aria-pressed={brandFilter === "all"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[11px] font-semibold transition ${
               brandFilter === "all"
                 ? "bg-white text-ink shadow-2xs"
@@ -114,6 +120,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
           <button
             type="button"
             onClick={() => setBrandFilter("ninja")}
+            aria-pressed={brandFilter === "ninja"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[11px] font-semibold transition ${
               brandFilter === "ninja"
                 ? "bg-white text-ink shadow-2xs"
@@ -125,6 +132,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
           <button
             type="button"
             onClick={() => setBrandFilter("shark")}
+            aria-pressed={brandFilter === "shark"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[11px] font-semibold transition ${
               brandFilter === "shark"
                 ? "bg-white text-ink shadow-2xs"
@@ -141,7 +149,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
               type="checkbox"
               checked={hideLowData}
               onChange={(e) => setHideLowData(e.target.checked)}
-              className="rounded border-line text-teal focus:ring-teal cursor-pointer"
+              className="rounded border-line text-teal-text focus:ring-teal cursor-pointer"
             />
             <span>Hide low data (&lt;10 reviews)</span>
           </label>
@@ -150,6 +158,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
             <input
               type="text"
               placeholder="Search listings…"
+              aria-label="Search listings"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-48 rounded-lg border border-line bg-canvas px-3 py-1 text-[12px] text-ink placeholder:text-ink-40 focus:border-ink focus:bg-white focus:outline-hidden transition"
@@ -158,6 +167,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
               <button
                 type="button"
                 onClick={() => setSearch("")}
+                aria-label="Clear search"
                 className="absolute right-2.5 top-1.5 text-[11px] text-ink-40 hover:text-ink cursor-pointer"
               >
                 ✕
@@ -170,45 +180,61 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
       {/* Interactive Table */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-[13px]">
+          <caption className="sr-only">All listings, sortable by column</caption>
           <thead>
             <tr className="border-b border-line text-left text-[11px] font-bold uppercase tracking-[0.08em] text-ink-40 select-none">
-              <th
-                onClick={() => handleSort("name")}
-                className="pb-2.5 cursor-pointer hover:text-ink"
-                title="Sort by product name"
-              >
-                Product {renderSortArrow("name")}
+              <th scope="col" aria-sort={ariaSort("name")} className="pb-2.5 ">
+                <button
+                  type="button"
+                  onClick={() => handleSort("name")}
+                  title="Sort by product name"
+                  className="cursor-pointer font-bold uppercase tracking-[0.08em] hover:text-ink"
+                >
+                  Product {renderSortArrow("name")}
+                </button>
               </th>
-              <th
-                onClick={() => handleSort("brand")}
-                className="pb-2.5 cursor-pointer hover:text-ink"
-                title="Sort by brand"
-              >
-                Brand {renderSortArrow("brand")}
+              <th scope="col" aria-sort={ariaSort("brand")} className="pb-2.5 ">
+                <button
+                  type="button"
+                  onClick={() => handleSort("brand")}
+                  title="Sort by brand"
+                  className="cursor-pointer font-bold uppercase tracking-[0.08em] hover:text-ink"
+                >
+                  Brand {renderSortArrow("brand")}
+                </button>
               </th>
-              <th
-                onClick={() => handleSort("volume")}
-                className="pb-2.5 text-right cursor-pointer hover:text-ink"
-                title="Sort by review volume"
-              >
-                Reviews {renderSortArrow("volume")}
+              <th scope="col" aria-sort={ariaSort("volume")} className="pb-2.5 text-right ">
+                <button
+                  type="button"
+                  onClick={() => handleSort("volume")}
+                  title="Sort by review volume"
+                  className="cursor-pointer font-bold uppercase tracking-[0.08em] hover:text-ink"
+                >
+                  Reviews {renderSortArrow("volume")}
+                </button>
               </th>
-              <th
-                onClick={() => handleSort("rating")}
-                className="pb-2.5 text-right cursor-pointer hover:text-ink"
-                title="Sort by verified purchase rating"
-              >
-                Verified Avg {renderSortArrow("rating")}
+              <th scope="col" aria-sort={ariaSort("rating")} className="pb-2.5 text-right ">
+                <button
+                  type="button"
+                  onClick={() => handleSort("rating")}
+                  title="Sort by verified purchase rating"
+                  className="cursor-pointer font-bold uppercase tracking-[0.08em] hover:text-ink"
+                >
+                  Verified Avg {renderSortArrow("rating")}
+                </button>
               </th>
-              <th className="pb-2.5 text-center">Trend</th>
-              <th
-                onClick={() => handleSort("negative")}
-                className="pb-2.5 text-right cursor-pointer hover:text-ink"
-                title="Sort by percentage negative"
-              >
-                % Negative {renderSortArrow("negative")}
+              <th scope="col" className="pb-2.5 text-center">Trend</th>
+              <th scope="col" aria-sort={ariaSort("negative")} className="pb-2.5 text-right ">
+                <button
+                  type="button"
+                  onClick={() => handleSort("negative")}
+                  title="Sort by percentage negative"
+                  className="cursor-pointer font-bold uppercase tracking-[0.08em] hover:text-ink"
+                >
+                  % Negative {renderSortArrow("negative")}
+                </button>
               </th>
-              <th className="pb-2.5 pl-4">Top Issue</th>
+              <th scope="col" className="pb-2.5 pl-4">Top Issue</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line-soft">
@@ -224,7 +250,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
                   <td className="py-3">
                     <Link
                       href={`/${s.brand.toLowerCase()}/${s.sku.id}`}
-                      className="font-semibold text-ink hover:text-teal"
+                      className="font-semibold text-ink hover:text-teal-text"
                     >
                       {s.sku.name}
                     </Link>
@@ -272,7 +298,7 @@ export function MasterSkuTable({ rows }: { rows: PortfolioSkuRow[] }) {
           Showing {sortedAndFiltered.length} of {rows.length} listings
         </span>
         <span>
-          Click any column header to toggle sort order
+          Select a column header to sort
         </span>
       </div>
     </div>

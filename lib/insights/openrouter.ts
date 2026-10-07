@@ -55,7 +55,7 @@ function buildPrompt(input: GenerateInsightInput): string {
     .join(", ");
 
   return `
-Product: ${sku.brand} ${sku.name} (${sku.id}, ASIN: ${sku.asin}${sku.model ? `, Model: ${sku.model}` : ""})
+Product: ${sku.brand} ${sku.name} (${sku.id}${sku.asin ? `, ASIN: ${sku.asin}` : ""}${sku.model ? `, Model: ${sku.model}` : ""})
 Total Reviews: ${reviews.length} (Verified: ${stats.verified.n}, Unverified: ${reviews.length - stats.verified.n})
 Rating: Verified Average ${stats.verified.avg !== null ? stats.verified.avg.toFixed(2) : "N/A"}★ | All Reviews Average ${stats.all.avg !== null ? stats.all.avg.toFixed(2) : "N/A"}★
 Sentiment Breakdown: ${stats.all.pctPositive.toFixed(0)}% positive, ${stats.all.pctNeutral.toFixed(0)}% neutral, ${stats.all.pctNegative.toFixed(0)}% negative
@@ -93,6 +93,7 @@ Rules:
    - "unknown": Too few verified reviews (<5) to draw any credible conclusion without speculation.
 2. Voice and Style:
    - Concise, disciplined, and commercially grounded.
+   - Confident and measured, never alarmist. Prefer plain, precise words ("fell", "declined", "weakens") over dramatic ones ("crashed", "collapsed", "cripple", "disaster"). Let the numbers carry the weight.
    - AVOID EM DASHES. Use colons, parentheses, or periods instead.
    - Do NOT merely describe what is on the charts ("the rating went from X to Y"). State the root causes, consumer perceptions in the Indian market, and operational realities.
    - Ground every claim in the provided review evidence.

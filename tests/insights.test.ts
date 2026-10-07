@@ -22,14 +22,18 @@ test("insights system", async (t) => {
     assert.notEqual(skuDataHash(altered), hash1);
   });
 
-  await t.test("baked insights file exists and contains all 12 SKUs", () => {
+  // A SKU registered before its first reviews are imported has nothing to
+  // summarise yet; it gets an insight once `npm run insights:generate` runs.
+  const withReviews = SKUS.filter((s) => allReviews.some((r) => r.skuId === s.id));
+
+  await t.test("baked insights file exists and covers every SKU that has reviews", () => {
     const file = getAllInsights();
-    assert.equal(file.insights.length, 12);
+    assert.equal(file.insights.length, withReviews.length);
     assert.ok(file.model.length > 0);
     assert.ok(file.generatedAt.length > 0);
 
     const validTones = new Set(["critical", "warning", "watch", "healthy", "unknown"]);
-    for (const sku of SKUS) {
+    for (const sku of withReviews) {
       const insight = file.insights.find((i) => i.skuId === sku.id);
       assert.ok(insight, `Missing baked insight for SKU: ${sku.id}`);
       assert.ok(validTones.has(insight.tone), `Invalid tone: ${insight.tone} for ${sku.id}`);
@@ -42,7 +46,7 @@ test("insights system", async (t) => {
   });
 
   await t.test("freshness check matches current seed reviews", () => {
-    for (const sku of SKUS) {
+    for (const sku of withReviews) {
       const mine = allReviews.filter((r) => r.skuId === sku.id);
       const { insight, isStale, currentHash } = getSkuInsight(sku.id, mine);
       assert.ok(insight);

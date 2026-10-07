@@ -10,9 +10,11 @@ import { warningLabel } from "@/lib/validate";
 
 type State =
   | { status: "idle" }
-  | { status: "uploading" }
-  | { status: "done"; reports: IngestReport[] }
-  | { status: "error"; message: string; unmapped?: string[] };
+  | { status: "uploading"; fileNames?: string[] }
+  | { status: "done"; reports: IngestReport[]; failures: FileFailure[] }
+  | { status: "error"; message: string; unmapped?: string[]; failures?: FileFailure[] };
+
+type FileFailure = { filename: string; error: string };
 
 function detectSkuInText(text: string): string | null {
   const lower = text.toLowerCase();
@@ -79,7 +81,7 @@ export function UploadForm() {
         return;
       }
 
-      setState({ status: "uploading" });
+      setState({ status: "uploading", fileNames: list.map((f) => f.name) });
       const form = new FormData();
       for (const f of list) form.append("file", f);
 
@@ -91,10 +93,15 @@ export function UploadForm() {
             status: "error",
             message: json.error ?? "Import failed.",
             unmapped: json.unmappedSheets,
+            failures: json.failures,
           });
           return;
         }
-        setState({ status: "done", reports: json.reports as IngestReport[] });
+        setState({
+          status: "done",
+          reports: json.reports as IngestReport[],
+          failures: (json.failures ?? []) as FileFailure[],
+        });
         router.refresh();
       } catch (err) {
         setState({
@@ -157,7 +164,7 @@ export function UploadForm() {
         });
         return;
       }
-      setState({ status: "done", reports: json.reports as IngestReport[] });
+      setState({ status: "done", reports: json.reports as IngestReport[], failures: [] });
       setPasteText("");
       setDebouncedText("");
       router.refresh();
@@ -223,7 +230,7 @@ export function UploadForm() {
           }}
           className={`pb-2.5 px-4 text-[13px] font-semibold transition border-b-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal rounded-t ${
             mode === "drop"
-              ? "border-teal text-teal"
+              ? "border-teal text-teal-text"
               : "border-transparent text-ink-60 hover:text-ink"
           }`}
         >
@@ -245,7 +252,7 @@ export function UploadForm() {
           }}
           className={`pb-2.5 px-4 text-[13px] font-semibold transition border-b-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal rounded-t ${
             mode === "paste"
-              ? "border-teal text-teal"
+              ? "border-teal text-teal-text"
               : "border-transparent text-ink-60 hover:text-ink"
           }`}
         >
@@ -319,14 +326,14 @@ export function UploadForm() {
               <optgroup label="Ninja Products">
                 {SKUS.filter((s) => s.brand === "Ninja").map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({s.model ?? s.asin})
+                    {s.name}{s.model ?? s.asin ? ` (${s.model ?? s.asin})` : ""}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Shark Products">
                 {SKUS.filter((s) => s.brand === "Shark").map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({s.model ?? s.asin})
+                    {s.name}{s.model ?? s.asin ? ` (${s.model ?? s.asin})` : ""}
                   </option>
                 ))}
               </optgroup>
@@ -358,7 +365,7 @@ export function UploadForm() {
             <div className="rounded-lg border border-line bg-surface p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-teal-tint px-2.5 py-0.5 text-[12px] font-semibold text-teal">
+                  <span className="rounded-full bg-teal-tint px-2.5 py-0.5 text-[12px] font-semibold text-teal-text">
                     ✓ {parsedReviews.length} review{parsedReviews.length === 1 ? "" : "s"} parsed
                   </span>
                   <span className="text-[12px] text-ink-60">
@@ -369,7 +376,7 @@ export function UploadForm() {
                   type="button"
                   disabled={state.status === "uploading"}
                   onClick={sendPaste}
-                  className="rounded-md bg-teal px-4 py-1.5 text-[13px] font-semibold text-white transition hover:bg-[color:var(--color-teal-bright)] disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal"
+                  className="rounded-md bg-teal px-4 py-1.5 text-[13px] font-semibold text-ink transition hover:bg-teal-dark hover:text-white disabled:opacity-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal"
                 >
                   {state.status === "uploading"
                     ? "Importing…"
@@ -409,7 +416,7 @@ export function UploadForm() {
                         </td>
                         <td className="py-2 px-3">
                           {r.verified ? (
-                            <span className="text-[11px] font-medium text-teal">Yes</span>
+                            <span className="text-[11px] font-medium text-teal-text">Yes</span>
                           ) : (
                             <span className="text-[11px] text-ink-40">No</span>
                           )}
@@ -431,20 +438,57 @@ export function UploadForm() {
         </div>
       )}
 
+      {state.status === "uploading" ? (
+        <div className="mt-5 rounded-lg border border-line bg-white p-4" role="status">
+          <p className="text-[13px] font-semibold">
+            Importing{state.fileNames && state.fileNames.length > 0 ? ` ${state.fileNames.length} file${state.fileNames.length === 1 ? "" : "s"}` : ""}…
+          </p>
+          {state.fileNames && state.fileNames.length > 0 ? (
+            <p className="mt-0.5 truncate text-[12px] text-ink-60">{state.fileNames.join(", ")}</p>
+          ) : null}
+          <div
+            role="progressbar"
+            aria-label="Import in progress"
+            className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-line-soft"
+          >
+            <div className="absolute inset-y-0 w-1/3 animate-pulse rounded-full bg-teal" />
+          </div>
+        </div>
+      ) : null}
+
       {state.status === "error" ? (
         <div
           role="alert"
-          className="mt-5 rounded-lg border border-[#e5b4b0] bg-[#fdefee] p-4"
+          className="mt-5 rounded-lg border border-brand-line bg-brand-tint p-4"
         >
-          <p className="text-[13px] font-semibold text-[#8f2019]">
+          <p className="text-[13px] font-semibold text-brand-dark">
             Nothing was imported.
           </p>
-          <p className="mt-1 text-[13px] text-[#8f2019]">{state.message}</p>
+          <p className="mt-1 text-[13px] text-brand-dark">{state.message}</p>
+          {state.unmapped && state.unmapped.length > 0 ? (
+            <p className="mt-1 text-[12px] text-brand-dark">
+              Tabs we could not match: {state.unmapped.join(", ")}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
       {state.status === "done" ? (
         <div className="mt-5 space-y-4">
+          {state.failures.length > 0 ? (
+            <div role="alert" className="rounded-lg border border-brand-line bg-brand-tint p-4">
+              <p className="text-[13px] font-semibold text-brand-dark">
+                {state.failures.length} file{state.failures.length === 1 ? " was" : "s were"} not imported. The others were saved.
+              </p>
+              <ul className="mt-1 space-y-1 text-[13px] text-brand-dark">
+                {state.failures.map((f) => (
+                  <li key={f.filename}>
+                    <b className="font-semibold">{f.filename}</b>: {f.error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {state.reports.map((r, i) => (
             <ReportCard key={`${r.filename}-${i}`} report={r} />
           ))}
@@ -464,7 +508,7 @@ function ReportCard({ report }: { report: IngestReport }) {
           className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
             nothingNew
               ? "bg-line-soft text-ink-60"
-              : "bg-teal-tint text-teal"
+              : "bg-teal-tint text-teal-text"
           }`}
         >
           {nothingNew ? "Already up to date" : `${report.inserted} new reviews`}
@@ -476,7 +520,7 @@ function ReportCard({ report }: { report: IngestReport }) {
           All {report.duplicates} review{report.duplicates === 1 ? "" : "s"} in this import are already in the database. Duplicates were skipped to prevent double-counting.
         </div>
       ) : (
-        <div className="mt-3 flex items-center justify-between rounded-md border border-teal-line bg-teal-tint p-3 text-[12px] text-teal">
+        <div className="mt-3 flex items-center justify-between rounded-md border border-teal-line bg-teal-tint p-3 text-[12px] text-teal-text">
           <span>
             Added {report.inserted} new review{report.inserted === 1 ? "" : "s"} to the database.
           </span>
@@ -508,13 +552,13 @@ function ReportCard({ report }: { report: IngestReport }) {
             {report.warnings.length} thing
             {report.warnings.length === 1 ? "" : "s"} to look at
           </p>
-          <ul className="mt-1.5 space-y-1 text-[12px] text-[#6b4a10]">
+          <ul className="mt-1.5 space-y-1 text-[12px] text-warn">
             {report.warnings.map((w, i) => (
               <li key={i}>{warningLabel(w)}</li>
             ))}
           </ul>
           <p className="mt-2 text-[11px] text-warn">
-            These were imported anyway - they are notes on the paste, not errors.
+            These are notes on the file, not errors. Everything else was imported.
           </p>
         </div>
       ) : null}
@@ -560,11 +604,11 @@ function ReportCard({ report }: { report: IngestReport }) {
 function SkippedRows({ rows }: { rows: SkippedRow[] }) {
   const shown = rows.slice(0, 12);
   return (
-    <div className="mt-4 rounded-md border border-[#e5b4b0] bg-[#fdefee] p-3">
-      <p className="text-[12px] font-bold uppercase tracking-wide text-[#8f2019]">
+    <div className="mt-4 rounded-md border border-brand-line bg-brand-tint p-3">
+      <p className="text-[12px] font-bold uppercase tracking-wide text-brand-dark">
         {rows.length} row{rows.length === 1 ? "" : "s"} not imported
       </p>
-      <ul className="mt-1.5 space-y-1 text-[12px] text-[#8f2019]">
+      <ul className="mt-1.5 space-y-1 text-[12px] text-brand-dark">
         {shown.map((r) => (
           <li key={`${r.sheetName}-${r.row}`}>
             <b className="font-semibold">
@@ -575,11 +619,11 @@ function SkippedRows({ rows }: { rows: SkippedRow[] }) {
         ))}
       </ul>
       {rows.length > shown.length ? (
-        <p className="mt-1.5 text-[11px] text-[#8f2019]">
+        <p className="mt-1.5 text-[11px] text-brand-dark">
           and {rows.length - shown.length} more.
         </p>
       ) : null}
-      <p className="mt-2 text-[11px] text-[#8f2019]">
+      <p className="mt-2 text-[11px] text-brand-dark">
         Everything else in the file was imported. Fix these rows and import
         again - what is already in will not be counted twice.
       </p>

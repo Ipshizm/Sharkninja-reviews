@@ -91,7 +91,7 @@
       "evidence": [
         "Only 1 verified purchase review, which gave 5 stars",
         "3 unverified 1-star reviews posted on a single day (2026-04-01)",
-        "Overall listing average collapsed to 2.00 due to unverified reviews"
+        "Overall listing average fell to 2.00, driven by unverified reviews"
       ],
       "dataHash": "86afdf0ab82ef049",
       "generatedAt": "2026-09-08T11:15:00.000Z",
@@ -100,7 +100,7 @@
     {
       "skuId": "shark-flex-breeze",
       "tone": "critical",
-      "headline": "Severe rating collapse driven by unmet 70-foot airflow expectations, rapid battery drain, and absent demo support.",
+      "headline": "Sharp rating decline driven by unmet 70-foot airflow expectations, rapid battery drain, and absent demo support.",
       "body": [
         "The Shark Flex Breeze is experiencing a precipitous sentiment breakdown: verified ratings dropped from 3.82 in April to 2.55 in May, 2.00 in June, and 1.00 in August. Half of all buyers (49%) rate it 1 or 2 stars.",
         "The core breakdown stems from aggressive marketing claims: reviewers repeatedly highlight that the airflow does not project beyond 8 to 10 feet, contradicting the advertised 70-foot throw. In outdoor and cordless modes, buyers report battery shutdown within 5 to 15 minutes.",
@@ -109,7 +109,7 @@
       "soWhat": "High return rates, severe brand damage in premium climate care, and high risk of Amazon customer sentiment penalties.",
       "watch": "Revise Amazon listing copy immediately to align air throw expectations; audit battery quality and customer support routing.",
       "evidence": [
-        "Verified monthly rating crashed from 3.82 (Apr) to 1.00 (Aug)",
+        "Verified monthly rating fell from 3.82 (Apr) to 1.00 (Aug)",
         "49% of all reviews are 1 or 2 stars (17 negative reviews)",
         "71% of negatives cite product capability and 65% cite listing expectation mismatches",
         "Top complaint theme: 'air flow' (4 reviews) and 'battery backup' (2 reviews)"
@@ -127,7 +127,7 @@
         "Negative sentiment stems from two distinct defects: sensor failures locking the display at 0% or failing after 2 to 3 months, and square footage disputes where customers find the unit unable to reduce AQI in rooms larger than 300 sq ft despite 1400 sq ft claims.",
         "High replacement filter costs and noise on turbo mode also generate recurring customer friction."
       ],
-      "soWhat": "In a competitive Indian air purifier market dominated by Coway, Philips, and Dyson, sensor failures cripple repurchase and recommendation rates.",
+      "soWhat": "In a competitive Indian air purifier market dominated by Coway, Philips, and Dyson, sensor failures weaken repurchase and recommendation rates.",
       "watch": "Sensor RMA replacement batch tracking and filter pricing strategy ahead of North India's winter peak.",
       "evidence": [
         "36% negative sentiment share across 47 reviews",

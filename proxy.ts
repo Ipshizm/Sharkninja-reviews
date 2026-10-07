@@ -8,6 +8,10 @@ export async function proxy(req: NextRequest) {
 
   if (PUBLIC.has(pathname)) return NextResponse.next();
 
+  // Local `next dev` only: no sign-in needed on localhost. NODE_ENV is
+  // "production" for `next start` and on Vercel, so this never applies there.
+  if (process.env.NODE_ENV === "development") return NextResponse.next();
+
   // Temporary emergency access: dashboard pages are publicly viewable, while
   // every mutating API remains protected below. Remove this block when the
   // Vercel account is recovered and normal sign-in can be restored.

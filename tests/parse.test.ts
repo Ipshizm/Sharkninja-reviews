@@ -141,6 +141,12 @@ describe("sheet mapping", () => {
 
   it("returns nothing for a tab it has never seen", () => {
     assert.equal(skuForSheet("Ninja Speediboi 9000"), undefined);
+    // Crispi, however the tab is written; ambiguous names resolve to nothing.
+    assert.equal(skuForSheet("Crispi")?.id, "ninja-crispi");
+    assert.equal(skuForSheet("Ninja CRISPi")?.id, "ninja-crispi");
+    assert.equal(skuForSheet("crispi glass")?.id, "ninja-crispi");
+    assert.equal(skuForSheet("Power-Detect")?.id, "shark-powerdetect");
+    assert.equal(skuForSheet("Detect"), undefined);
   });
 });
 

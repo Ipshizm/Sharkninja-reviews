@@ -23,8 +23,17 @@ export function validate(
   reviews: ParsedReview[],
   duplicateHashes: number,
   skippedRows: SkippedRow[] = [],
+  unmappedSheets: string[] = [],
 ): Warning[] {
   const warnings: Warning[] = [];
+
+  if (unmappedSheets.length > 0) {
+    warnings.push({
+      kind: "unrecognised-sheet",
+      skuId: "",
+      detail: `${unmappedSheets.length === 1 ? "Tab" : "Tabs"} not imported because no product matches: ${unmappedSheets.join(", ")}. Rename ${unmappedSheets.length === 1 ? "it" : "them"} after the product, or ask the dashboard maintainer to add ${unmappedSheets.length === 1 ? "a new product" : "new products"}. Reviews already loaded are skipped automatically.`,
+    });
+  }
   const today = new Date().toISOString().slice(0, 10);
 
   for (const r of reviews) {

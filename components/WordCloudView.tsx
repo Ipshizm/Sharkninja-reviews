@@ -73,7 +73,7 @@ export function WordCloudView({
   const colour = (v: number, max: number) => {
     const t = v / max;
     if (tone === "positive") {
-      return t > 0.6 ? "#108474" : t > 0.3 ? "#3ea394" : "#86c6bb";
+      return t > 0.6 ? "#00a5af" : t > 0.3 ? "#4dc0c7" : "#99dbdf";
     }
     return t > 0.6 ? "#d85827" : t > 0.3 ? "#e08159" : "#eeb69c";
   };
@@ -82,7 +82,7 @@ export function WordCloudView({
   const top = words.slice().sort((a, b) => b.value - a.value)[0];
   const ramp =
     tone === "positive"
-      ? ["#86c6bb", "#3ea394", "#108474"]
+      ? ["#99dbdf", "#4dc0c7", "#00a5af"]
       : ["#eeb69c", "#e08159", "#d85827"];
 
   return (

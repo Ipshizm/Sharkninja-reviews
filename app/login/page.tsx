@@ -43,7 +43,7 @@ export default async function LoginPage({
         ) : null}
         <button
           type="submit"
-          className="mt-4 w-full rounded-md bg-teal px-4 py-2 text-[14px] font-semibold text-white hover:bg-teal-dark"
+          className="mt-4 w-full rounded-md bg-teal px-4 py-2 text-[14px] font-semibold text-ink hover:bg-teal-dark hover:text-white"
         >
           Sign in
         </button>

@@ -30,16 +30,16 @@ const TONE_BADGE: Record<
   },
   watch: {
     label: "Watch Item",
-    border: "border-[#bee3f8]",
-    bg: "bg-[#ebf8ff]",
-    text: "text-[#2b6cb0]",
-    dot: "bg-[#3182ce]",
+    border: "border-watch-line",
+    bg: "bg-watch-bg",
+    text: "text-ink",
+    dot: "bg-ink-60",
   },
   healthy: {
     label: "Healthy Performer",
     border: "border-teal-line",
     bg: "bg-teal-tint",
-    text: "text-teal",
+    text: "text-teal-text",
     dot: "bg-teal",
   },
   unknown: {
@@ -55,11 +55,11 @@ type FilterTab = "all" | "attention" | "healthy" | "ninja" | "shark";
 
 export function ExecutiveBriefing({
   insights,
-  model,
+  totalReviews,
   generatedAt,
 }: {
   insights: EnrichedInsight[];
-  model: string;
+  totalReviews: number;
   generatedAt: string;
 }) {
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
@@ -112,20 +112,18 @@ export function ExecutiveBriefing({
     return list;
   }, [insights, activeTab, searchQuery]);
 
-  const cleanModel = model.replace("openrouter/", "").replace("anthropic/", "");
-
   return (
     <section className="rounded-xl border border-line bg-surface p-6">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-line bg-teal-tint px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-teal">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-line bg-teal-tint px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-teal-text">
               <span className="h-1.5 w-1.5 rounded-full bg-teal" />
               AI Intelligence Rollup
             </span>
             <span className="text-[12px] text-ink-40">
-              Synthesized by {cleanModel}
+              AI-generated from customer reviews
             </span>
           </div>
           <h2 className="display mt-2 text-xl font-bold tracking-tight text-ink sm:text-2xl">
@@ -142,13 +140,13 @@ export function ExecutiveBriefing({
             <span className="text-[10px] font-bold uppercase tracking-wider text-warn">Action Needed</span>
             <p className="tabular text-lg font-bold text-warn">{counts.warning}</p>
           </div>
-          <div className="rounded-lg border border-[#bee3f8] bg-[#ebf8ff] px-3 py-1.5 text-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2b6cb0]">Watch Items</span>
-            <p className="tabular text-lg font-bold text-[#2b6cb0]">{counts.watch}</p>
+          <div className="rounded-lg border border-watch-line bg-watch-bg px-3 py-1.5 text-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-ink">Watch Items</span>
+            <p className="tabular text-lg font-bold text-ink">{counts.watch}</p>
           </div>
           <div className="rounded-lg border border-teal-line bg-teal-tint px-3 py-1.5 text-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-teal">Healthy</span>
-            <p className="tabular text-lg font-bold text-teal">{counts.healthy}</p>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-teal-text">Healthy</span>
+            <p className="tabular text-lg font-bold text-teal-text">{counts.healthy}</p>
           </div>
         </div>
       </div>
@@ -181,7 +179,7 @@ export function ExecutiveBriefing({
                   </div>
                   <Link
                     href={`/${item.brand.toLowerCase()}/${item.skuId}`}
-                    className="mt-1 block text-[13px] font-bold text-ink hover:text-teal"
+                    className="mt-1 block text-[13px] font-bold text-ink hover:text-teal-text"
                   >
                     {item.skuName}
                   </Link>
@@ -207,6 +205,7 @@ export function ExecutiveBriefing({
           <button
             type="button"
             onClick={() => setActiveTab("all")}
+            aria-pressed={activeTab === "all"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[12px] font-semibold transition ${
               activeTab === "all"
                 ? "bg-white text-ink shadow-2xs"
@@ -218,6 +217,7 @@ export function ExecutiveBriefing({
           <button
             type="button"
             onClick={() => setActiveTab("attention")}
+            aria-pressed={activeTab === "attention"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[12px] font-semibold transition ${
               activeTab === "attention"
                 ? "bg-white text-warn shadow-2xs"
@@ -229,9 +229,10 @@ export function ExecutiveBriefing({
           <button
             type="button"
             onClick={() => setActiveTab("healthy")}
+            aria-pressed={activeTab === "healthy"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[12px] font-semibold transition ${
               activeTab === "healthy"
-                ? "bg-white text-teal shadow-2xs"
+                ? "bg-white text-teal-text shadow-2xs"
                 : "text-ink-60 hover:text-ink"
             }`}
           >
@@ -240,6 +241,7 @@ export function ExecutiveBriefing({
           <button
             type="button"
             onClick={() => setActiveTab("ninja")}
+            aria-pressed={activeTab === "ninja"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[12px] font-semibold transition ${
               activeTab === "ninja"
                 ? "bg-white text-ink shadow-2xs"
@@ -251,6 +253,7 @@ export function ExecutiveBriefing({
           <button
             type="button"
             onClick={() => setActiveTab("shark")}
+            aria-pressed={activeTab === "shark"}
             className={`cursor-pointer rounded-md px-3 py-1 text-[12px] font-semibold transition ${
               activeTab === "shark"
                 ? "bg-white text-ink shadow-2xs"
@@ -265,6 +268,7 @@ export function ExecutiveBriefing({
           <input
             type="text"
             placeholder="Search SKU insights…"
+            aria-label="Search SKU insights"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-56 rounded-lg border border-line bg-canvas px-3 py-1.5 text-[12px] text-ink placeholder:text-ink-40 focus:border-ink focus:bg-white focus:outline-hidden"
@@ -273,6 +277,7 @@ export function ExecutiveBriefing({
             <button
               type="button"
               onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
               className="absolute right-2.5 top-2 text-[11px] text-ink-40 hover:text-ink cursor-pointer"
             >
               ✕
@@ -316,7 +321,7 @@ export function ExecutiveBriefing({
 
                     <Link
                       href={`/${item.brand.toLowerCase()}/${item.skuId}`}
-                      className="text-[12px] font-semibold text-teal hover:underline"
+                      className="text-[12px] font-semibold text-teal-text hover:underline"
                     >
                       SKU Detail →
                     </Link>
@@ -326,7 +331,7 @@ export function ExecutiveBriefing({
                     href={`/${item.brand.toLowerCase()}/${item.skuId}`}
                     className="mt-2 block group"
                   >
-                    <h4 className="text-[15px] font-bold text-ink group-hover:text-teal transition">
+                    <h4 className="text-[15px] font-bold text-ink group-hover:text-teal-text transition">
                       {item.skuName}
                     </h4>
                     <p className="mt-1 text-[13px] font-medium leading-snug text-ink-60">
@@ -371,7 +376,7 @@ export function ExecutiveBriefing({
                   <span>Synthesized for Amazon.in</span>
                   <Link
                     href={`/${item.brand.toLowerCase()}/${item.skuId}`}
-                    className="font-medium text-ink hover:text-teal"
+                    className="font-medium text-ink hover:text-teal-text"
                   >
                     Read full review breakdown ({item.skuName}) →
                   </Link>
@@ -392,7 +397,7 @@ export function ExecutiveBriefing({
           })}
         </span>
         <span className="text-ink-60">
-          Evaluated across 339 total customer reviews on Amazon.in
+          Evaluated across {totalReviews.toLocaleString("en-IN")} customer reviews on Amazon.in
         </span>
       </div>
     </section>

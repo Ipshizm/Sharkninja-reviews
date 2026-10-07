@@ -69,7 +69,8 @@ export type Warning = {
     | "duplicate-in-file"
     | "empty-review"
     | "future-date"
-    | "skipped-rows";
+    | "skipped-rows"
+    | "unrecognised-sheet";
   skuId: string;
   detail: string;
 };

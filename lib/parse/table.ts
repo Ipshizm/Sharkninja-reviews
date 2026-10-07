@@ -181,7 +181,7 @@ const truncate = (s: string) => (s.length > 50 ? `${s.slice(0, 50)}...` : s);
 function resolveSku(product: string, asin: string) {
   const a = asin.trim().toLowerCase();
   if (a) {
-    const byAsin = SKUS.find((s) => s.asin.toLowerCase() === a);
+    const byAsin = SKUS.find((s) => s.asin?.toLowerCase() === a);
     if (byAsin) return byAsin;
   }
   const p = product.trim().toLowerCase();
@@ -196,7 +196,7 @@ function resolveSku(product: string, asin: string) {
     (s) =>
       key(s.name) === k ||
       key(s.id) === k ||
-      s.asin.toLowerCase() === p ||
+      s.asin?.toLowerCase() === p ||
       (s.model ? key(s.model) === k : false),
   );
 }

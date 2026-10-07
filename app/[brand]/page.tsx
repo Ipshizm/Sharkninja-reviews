@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import {
   brandStats,
   bucketTable,
@@ -69,9 +70,7 @@ export default async function BrandPage({
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Link href="/" className="text-[13px] text-ink-60 hover:text-ink">
-            ← All brands
-          </Link>
+          <Breadcrumbs items={[{ label: "Dashboard", href: "/" }, { label: brand }]} />
           <h1 className="mt-1 text-2xl font-bold tracking-tight">{brand}</h1>
           <p className="text-[13px] text-ink-60">
             {stats.all.n} reviews across {stats.skus.length} SKUs
@@ -108,7 +107,7 @@ export default async function BrandPage({
 
       <ExecutiveBriefing
         insights={brandInsights}
-        model={rawInsights.model}
+        totalReviews={stats.reviews.length}
         generatedAt={rawInsights.generatedAt}
       />
 
@@ -166,7 +165,7 @@ export default async function BrandPage({
                   <td className="py-2.5">
                     <Link
                       href={`/${brand.toLowerCase()}/${s.sku.id}`}
-                      className="font-semibold hover:text-teal"
+                      className="font-semibold hover:text-teal-text"
                     >
                       {s.sku.name}
                     </Link>
@@ -209,7 +208,7 @@ function Highlight({
   brand: Brand;
   note: string;
 }) {
-  const accent = kind === "top" ? "border-teal bg-teal-tint" : "border-[#c8322b] bg-[#fdefee]";
+  const accent = kind === "top" ? "border-teal bg-teal-tint" : "border-brand bg-brand-tint";
   if (!stats) {
     return (
       <div className={`rounded-lg border p-5 ${accent}`}>
